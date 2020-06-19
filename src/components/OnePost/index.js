@@ -20,15 +20,52 @@ class User extends Component {
     }
 }
 
-class Photo extends Component {
+class PhotoList extends Component {
     render() {
-        return (
-            <div className="col-md-7 p-0">
-                <img src={this.props.photos} className="card-img-top" />
-            </div>
-        );
+        if (this.props.photos.length > 1)
+            return (
+                <div id="carouselId" className="carousel slide" data-ride="carousel" data-interval="0">
+                    <ol className="carousel-indicators">
+                        {this.props.photos.map((photo, index) => {
+                            if (index === 0) {
+                                return <li data-target="#carouselId" data-slide-to="0" className="active"></li>;
+                            } else {
+                                return <li data-target="#carouselId" data-slide-to={index}></li>
+                            }
+                        })}
+                    </ol>
+                    <div className="carousel-inner" role="listbox">
+                        {this.props.photos.map((photo, index) => {
+                            if (index === 0) {
+                                return <div className="carousel-item active">
+                                    <img className="d-block w-100" src={photo.link} alt="First slide" />
+                                </div>;
+                            } else {
+                                return <div className="carousel-item">
+                                    <img className="d-block w-100" src={photo.link} alt="First slide" />
+                                </div>;
+                            }
+                        })}
+                    </div>
+                    <a className="carousel-control-prev" href="#carouselId" role="button" data-slide="prev">
+                        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span className="sr-only">Previous</span>
+                    </a>
+                    <a className="carousel-control-next" href="#carouselId" role="button" data-slide="next">
+                        <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span className="sr-only">Next</span>
+                    </a>
+                </div>
+
+            );
+        else {
+            return (<div>
+                {this.props.photos.map(photo => <img src={photo.link} className="card-img-top" />)}
+            </div>)
+        }
     }
 }
+
 
 class Reaction extends Component {
     render() {
@@ -66,7 +103,7 @@ class OnePost extends Component {
         return (
             <div className="card container-fluid w-50 p-0">
                 <div className="d-flex">
-                    <Photo photos={this.props.photo.photos} />
+                    <PhotoList photos={this.props.photos} />
                     <div className="col-md-5">
                         <User username={this.props.post.username} />
                         <Reaction username={this.props.post.username}

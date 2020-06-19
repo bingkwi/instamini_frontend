@@ -44,12 +44,6 @@ class PhotoList extends Component {
                                 </div>;
                             }
                         })}
-                        {/* <div className="carousel-item">
-                            <img data-src="holder.js/900x500/auto/#666:#444/text:Second slide" alt="Second slide"/>
-                        </div>
-                        <div className="carousel-item">
-                            <img data-src="holder.js/900x500/auto/#666:#444/text:Third slide" alt="Third slide"/>
-                        </div> */}
                     </div>
                     <a className="carousel-control-prev" href="#carouselId" role="button" data-slide="prev">
                         <span className="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -79,7 +73,7 @@ class Reaction extends Component {
                     <i className="far fa-comment fa-md ml-2" aria-hidden="true"></i>
                 </div>
 
-                <div><span>{`${this.props.likeCount} likes, ${this.props.commentCount} comments`}</span>
+                <div><span>{`${this.props.likeCount} likes ${this.props.commentCount} comments`}</span>
                 </div>
                 <div>
                     <a className="insta-bold text-decoration-none text-dark" href="#">{this.props.username}</a>

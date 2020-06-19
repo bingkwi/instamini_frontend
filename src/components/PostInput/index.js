@@ -13,7 +13,7 @@ class Box extends Component {
                     <i className="far fa-images mr-2" ></i>
                 </div>
 
-                <button type="button" className="btn btn-primary btn-lg btn-block py-1">Post</button>
+                <button type="button" className="btn btn-primary btn-md btn-block py-1">Post</button>
 
             </div>
         );

@@ -5,71 +5,85 @@ import Post from './components/Post';
 import Profile from './components/ProfilePage';
 import Box from './components/PostInput';
 import OnePost from './components/OnePost';
+import Constants from './utils/Constants'
 
-function App() {
-  return (
-    <div>
-      <NavigationBar displayName="Quynh Bich" />
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.feed = [];
+  }
 
-      <section class="container-proflie">
-        <Profile
-          photo={{
-            photo: "./images/test.jpg"
-          }}
+  render() {
+    return (
+      <div>
+        <NavigationBar displayName="Quynh Bich" />
 
-          username={{
-            username: "binh.dohai",
-            displayName: "Quynh Bich"
-          }}
+        <section class="container-proflie">
+          <Profile
+            photo={{
+              photo: "./images/test.jpg"
+            }}
 
-          counting={{
-            post: 1,
-            followerCount: 2,
-            followingCount: 2
-          }}
+            username={{
+              username: "binh.dohai",
+              displayName: "Quynh Bich"
+            }}
 
-        />
-      </section>
-
-      <section class="container">
-        <Box />
-      </section>
-
-      <section class="container">
-        <Post
-          photo={ [
-            { photos: "./images/test.jpg",
-            photos: "./images/test.jpg",
-            photos: "./images/test.jpg"  }
-          ] 
-        }
-
-          post={{
-            username: "binh.dohai",
-            likeCount: 1,
-            commentCount: 2,
-            caption: "This is demo caption"
-          }}
-        />
-      </section>
-
-      <section>
-        <OnePost
-          photo={{
-            photos: "./images/test.jpg"            
-          }} 
-          
-          post={{
-            username: "binh.dohai",
-            likeCount: 1,
-            commentCount: 2,
-            caption: "This is demo caption"
-          }}
+            counting={{
+              post: 1,
+              followerCount: 2,
+              followingCount: 2
+            }}
 
           />
-      </section>
-    </div>
-  );
+        </section>
+
+        <section class="container">
+          <Box />
+        </section>
+
+        <section class="container">
+          <Post
+            photos={[
+              {
+                link: "./images/test.jpg"
+              },
+              {
+                link: "./images/test.jpg"
+              },
+              {
+                link: "./images/test.jpg"
+              }
+            ]
+            }
+
+            post={{
+              username: "binh.dohai",
+              likeCount: 1,
+              commentCount: 2,
+              caption: "This is demo caption"
+            }}
+          />
+        </section>
+
+        <section>
+          <OnePost
+            photo={{
+              photos: "./images/test.jpg"
+            }}
+
+            post={{
+              username: "binh.dohai",
+              likeCount: 1,
+              commentCount: 2,
+              caption: "This is demo caption"
+            }}
+
+          />
+        </section>
+      </div>
+    );
+  }
 }
 
 export default App;

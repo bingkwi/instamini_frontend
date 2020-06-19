@@ -1,24 +1,73 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import NavigationBar from './components/NavigationBar';
+import Post from './components/Post';
+import Profile from './components/ProfilePage';
+import Box from './components/PostInput';
+import OnePost from './components/OnePost';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <NavigationBar displayName="Quynh Bich" />
+
+      <section class="container-proflie">
+        <Profile
+          photo={{
+            photo: "./images/test.jpg"
+          }}
+
+          username={{
+            username: "binh.dohai",
+            displayName: "Quynh Bich"
+          }}
+
+          counting={{
+            post: 1,
+            followerCount: 2,
+            followingCount: 2
+          }}
+
+        />
+      </section>
+
+      <section class="container">
+        <Box />
+      </section>
+
+      <section class="container">
+        <Post
+          photo={ [
+            { photos: "./images/test.jpg",
+            photos: "./images/test.jpg",
+            photos: "./images/test.jpg"  }
+          ] 
+        }
+
+          post={{
+            username: "binh.dohai",
+            likeCount: 1,
+            commentCount: 2,
+            caption: "This is demo caption"
+          }}
+        />
+      </section>
+
+      <section>
+        <OnePost
+          photo={{
+            photos: "./images/test.jpg"            
+          }} 
+          
+          post={{
+            username: "binh.dohai",
+            likeCount: 1,
+            commentCount: 2,
+            caption: "This is demo caption"
+          }}
+
+          />
+      </section>
     </div>
   );
 }

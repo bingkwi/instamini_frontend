@@ -7,6 +7,8 @@ import Box from './components/PostInput';
 import OnePost from './components/OnePost';
 import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
+// import Constants from './utils/Constants'
+import LoginPage from './pages';
 
 class App extends React.Component {
 
@@ -111,9 +113,18 @@ class App extends React.Component {
 
         <section>
           <OnePost
-            photo={{
-              photos: "./images/test.jpg"
-            }}
+            photos={[
+              {
+                link: "./images/test.jpg"
+              },
+              {
+                link: "./images/test.jpg"
+              },
+              {
+                link: "./images/test.jpg"
+              }
+            ]
+            }
 
             post={{
               username: "binh.dohai",
@@ -124,6 +135,8 @@ class App extends React.Component {
 
           />
         </section> */}
+
+        {/* <LoginPage />  */}
       </div>
     );
   }

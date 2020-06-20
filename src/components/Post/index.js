@@ -72,7 +72,6 @@ class Reaction extends Component {
                     <i className="far fa-heart fa-md mr-2"></i>
                     <i className="far fa-comment fa-md ml-2" aria-hidden="true"></i>
                 </div>
-
                 <div>
                     <span>{`${this.props.likeCount} ${this.props.likeCount > 1 ? "likes" : "like"}, ${this.props.commentCount} ${this.props.commentCount > 1 ? "comments" : "comment"}`}</span>
                 </div>

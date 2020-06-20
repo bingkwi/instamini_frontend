@@ -1,16 +1,18 @@
 import React, { Component } from "react";
-import Constants from '../../utils/Constants';
+import Constant from '../../utils/Constants';
 
 class User extends Component {
     render() {
         return (
             <div className="header container p-2 my-1 d-flex align-items-center justify-content-between">
-                <div className="d-flex align-items-center">
-                    <img src={`${Constants.host}${this.props.userAvatar}`} className="img-fluid rounded-circle mr-2 ml-1" style={{ objectFit: "cover", width: "35px", height: "35px" }} alt="" />
-                    <a className="text-decoration-none text-dark ml-1 insta-bold" href="#" aria-haspopup="true" aria-expanded="false"
+                    <a className="d-flex align-items-center text-decoration-none text-dark ml-1 insta-bold" href={`/${this.props.username}`} aria-haspopup="true" aria-expanded="false"
                         style={{ fontSize: ".9rem" }}>
-                        {this.props.username} </a>
-                </div>
+                        <img src={`${Constant.host}${this.props.userAvatar}`} 
+                            className="img-fluid rounded-circle mr-2 ml-1" 
+                            style={{ objectFit: "cover", width: "35px", height: "35px" }} 
+                            alt="" />
+                        <span className="ml-1">{this.props.username}</span>
+                    </a>
                 <OptionDropdown />
             </div>
         );
@@ -22,7 +24,7 @@ class PhotoList extends Component {
         const carouselId = `pcrs_${this.props.postId}`;
         if (this.props.photos.length > 1)
             return (
-                <div id={carouselId} className="carousel slide" data-ride="carousel" data-interval="0">
+                <div id={carouselId} className="carousel slide" data-ride="carousel" data-interval="0" onDoubleClick={this.props.onLike}>
                     <ol className="carousel-indicators">
                         {this.props.photos.map((photo, index) => {
                             if (index === 0) {
@@ -36,11 +38,11 @@ class PhotoList extends Component {
                         {this.props.photos.map((photo, index) => {
                             if (index === 0) {
                                 return <div className="carousel-item active">
-                                    <img className="d-block w-100" src={`${Constants.host}${photo.link}`} alt="First slide" key="0" />
+                                    <img className="d-block w-100" src={`${Constant.host}${photo.link}`} alt="First slide" key="0" />
                                 </div>;
                             } else {
                                 return <div className="carousel-item">
-                                    <img className="d-block w-100" src={`${Constants.host}${photo.link}`} alt="First slide" key={index} />
+                                    <img className="d-block w-100" src={`${Constant.host}${photo.link}`} alt="First slide" key={index} />
                                 </div>;
                             }
                         })}
@@ -57,8 +59,8 @@ class PhotoList extends Component {
 
             );
         else {
-            return (<div>
-                {this.props.photos.map(photo => <img src={`${Constants.host}${photo.link}`} className="card-img-top" alt="A photo" />)}
+            return (<div onDoubleClick={this.props.onLike}>
+                {this.props.photos.map(photo => <img src={`${Constant.host}${photo.link}`} className="card-img-top" alt="A photo" />)}
             </div>)
         }
     }
@@ -68,9 +70,13 @@ class Reaction extends Component {
     render() {
         return (
             <>
-                <div style={{ fontSize: "1.5rem" }}>
-                    <i className="far fa-heart fa-md mr-2"></i>
-                    <i className="far fa-comment fa-md ml-2" aria-hidden="true"></i>
+                <div className="mb-1" style={{ fontSize: "1.5rem" }}>
+                    <button type="button" class="btn btn-lg btn-primary bg-transparent text-dark border-0 p-0 mr-2" onClick={this.props.onLikeClicked}>
+                        <i className={this.props.liked ? "fas fa-heart fa-lg text-danger" : "far fa-heart fa-lg"}></i>
+                    </button>
+                    <button type="button" class="btn btn-lg btn-primary bg-transparent text-dark border-0 p-0" onClick={this.props.onCommentClicked}>
+                        <i className="far fa-comment fa-lg" aria-hidden="true"></i>
+                    </button>
                 </div>
                 <div>
                     <span>{`${this.props.likeCount} ${this.props.likeCount > 1 ? "likes" : "like"}, ${this.props.commentCount} ${this.props.commentCount > 1 ? "comments" : "comment"}`}</span>
@@ -84,7 +90,7 @@ class Comment extends Component {
     render() {
         return (
             <div>
-                <a className="insta-bold text-decoration-none text-dark" href="#">{this.props.username}</a>
+                <a className="insta-bold text-decoration-none text-dark" href={`/${this.props.username}`}>{this.props.username}</a>
                 <span className="card-text ml-1">{this.props.content}</span>
             </div>
         )
@@ -96,11 +102,18 @@ class Caption extends Comment {
 }
 
 class CommentInput extends Component {
+    constructor(props) {
+        super(props);
+        this.inputField = undefined;
+    }
+    focus = () => {
+        this.inputField.focus();
+    }
     render() {
         return (
             <div className="card-footer text-muted px-0 py-0 d-flex">
-                <input type="text" className="form-control border border-white" name="" id="" placeholder="Add a comment..." />
-                <a name="" id="" className="btn btn-white text-primary" href="#" role="button">Post</a>
+                <input ref={inputField => this.inputField = inputField} onChange={this.props.onChange} type="text" className="form-control border border-white" placeholder="Add a comment..." />
+                <button className="btn btn-white text-primary">Post</button>
             </div>
         );
     }
@@ -128,19 +141,50 @@ class OptionDropdown extends Component {
 }
 
 class Post extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            ...props,
+            liked: this.props.likedBy.some(like => like.username === this.props.sessionUser),
+            pendingComment: ""
+        };
+        this.commentInput = undefined;
+    }
+
+    commitLike = (postId, token, willLike) => {
+        console.log(`${this.props.id} is${this.state.liked ? "" : " not"} liked!`)
+        fetch(`${Constant.host}/posts/${postId}/likes?key=${token}`,
+        {
+            method: willLike ? "POST" : "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(this.props.updatePosts);
+    };
+
+    createComment = postId => {
+
+    };
+
+    commitLikeCallback = () => this.commitLike(this.props.id, this.props.token, this.state.liked);
+
     render() {
         return (
             <div className="card container w-50 p-0 my-3">
                 <User username={this.props.username} userAvatar={this.props.userAvatar} />
-                <PhotoList photos={this.props.photos} postId={this.props.id} />
+                <PhotoList photos={this.props.photos} postId={this.props.id} 
+                    onLike={() => {this.setState({liked: true}, this.commitLikeCallback)}} />
                 <div className="card-body px-3 py-2">
                     <Reaction likeCount={this.props.likeCount}
-                        commentCount={this.props.commentCount} />
+                        commentCount={this.props.commentCount}
+                        liked={this.state.liked}
+                        onLikeClicked={() => {this.setState({liked: !this.state.liked}, this.commitLikeCallback)}}
+                        onCommentClicked={() => {this.commentInput.focus()}} />
                     <Caption content={this.props.caption} username={this.props.username} />
                     {this.props.comments.map(comment => <Comment {...comment} key={comment.id} />)}
                 </div>
-                
-                <CommentInput />
+                <CommentInput ref={input => this.commentInput = input} 
+                    onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value.trim() })} />
             </div>
         );
     }

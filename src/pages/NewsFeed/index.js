@@ -12,8 +12,12 @@ class NewsFeed extends Component {
         };
     }
 
-    componentDidMount() {
+    updatePosts = () => {
         this.retrievePosts(this.props.username, this.props.token);
+    }
+
+    componentDidMount() {
+        this.updatePosts();
     }
 
     // componentDidUpdate() {
@@ -43,7 +47,7 @@ class NewsFeed extends Component {
     render() {
         return (
             <>
-                {this.state.posts.map(post => <Post {...post} key={post.id} />)}
+                {this.state.posts.map(post => <Post {...post} key={post.id} updatePosts={this.updatePosts} sessionUser={this.props.username} token={this.props.token} />)}
             </>
         );
     }

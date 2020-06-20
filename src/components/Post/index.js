@@ -109,11 +109,20 @@ class CommentInput extends Component {
     focus = () => {
         this.inputField.focus();
     }
+    onKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            this.props.onSubmitComment();
+        }
+    }
     render() {
         return (
             <div className="card-footer text-muted px-0 py-0 d-flex">
-                <input ref={inputField => this.inputField = inputField} onChange={this.props.onChange} type="text" className="form-control border border-white" placeholder="Add a comment..." />
-                <button className="btn btn-white text-primary">Post</button>
+                <input ref={inputField => this.inputField = inputField} 
+                    onChange={this.props.onChange} type="text" 
+                    className="form-control border border-white" placeholder="Add a comment..." 
+                    value={this.props.value}
+                    onKeyDown={this.onKeyDown} />
+                <button className="btn btn-white text-primary" onClick={this.props.onSubmitComment}>Post</button>
             </div>
         );
     }
@@ -162,11 +171,25 @@ class Post extends Component {
         }).then(this.props.updatePosts);
     };
 
-    createComment = postId => {
-
+    createComment = (postId, token, comment) => {
+        fetch(`${Constant.host}/posts/${postId}/comments?key=${token}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                postId: postId,
+                content: comment
+            })
+        }).then(this.props.updatePosts);
     };
 
     commitLikeCallback = () => this.commitLike(this.props.id, this.props.token, this.state.liked);
+    createCommentCallback = () => {
+        this.createComment(this.props.id, this.props.token, this.state.pendingComment.trim());
+        this.setState({ pendingComment: "" });
+    }
 
     render() {
         return (
@@ -184,7 +207,9 @@ class Post extends Component {
                     {this.props.comments.map(comment => <Comment {...comment} key={comment.id} />)}
                 </div>
                 <CommentInput ref={input => this.commentInput = input} 
-                    onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value.trim() })} />
+                    onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}
+                    value={this.state.pendingComment} 
+                    onSubmitComment={this.createCommentCallback}/>
             </div>
         );
     }

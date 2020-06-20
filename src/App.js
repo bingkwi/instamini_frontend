@@ -5,20 +5,61 @@ import Post from './components/Post';
 import Profile from './components/ProfilePage';
 import Box from './components/PostInput';
 import OnePost from './components/OnePost';
-import Constants from './utils/Constants'
+import Constant from './utils/Constants';
+import NewsFeed from './pages/NewsFeed';
 
 class App extends React.Component {
+
   constructor(props) {
     super(props);
-    this.feed = [];
+    this.state = {
+      ...props,
+      username: undefined,
+      token: undefined,
+      userLink: undefined
+    };
+  }
+
+  login() {
+    const username = "binhdh";
+    fetch(`${Constant.host}/session`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: username,
+        password: "123456"
+      })
+    }).then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      return Promise.resolve({
+        tokenResponse : {}
+      })
+    }).then(tokenResponse => {
+      this.setState({
+        username: tokenResponse.username,
+        token: tokenResponse.token,
+        userLink: tokenResponse.link
+      });
+    });
+  }
+
+  componentDidMount() {
+    this.login();
   }
 
   render() {
     return (
       <div>
         <NavigationBar displayName="Quynh Bich" />
-
-        <section class="container-proflie">
+        {this.state.username && this.state.token && this.state.userLink ? 
+          <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+          : ""
+        }
+        {/* <section class="container-proflie">
           <Profile
             photo={{
               photo: "./images/test.jpg"
@@ -56,7 +97,9 @@ class App extends React.Component {
               }
             ]
             }
+            comments={[
 
+            ]}
             post={{
               username: "binh.dohai",
               likeCount: 1,
@@ -80,7 +123,7 @@ class App extends React.Component {
             }}
 
           />
-        </section>
+        </section> */}
       </div>
     );
   }

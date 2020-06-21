@@ -301,6 +301,20 @@ class Post extends Component {
             }).then(this.props.updatePosts);
     }
 
+    deleteComment = (commentId, token) => {
+        const okToDelete = window.confirm("Are you sure want to delete?");
+        if (!okToDelete) {
+            return;
+        }
+        fetch(`${Constant.host}/comments/${commentId}?key=${token}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(this.props.updatePosts);
+    }
+
     commitLikeCallback = () => this.commitLike(this.props.id, this.props.token, this.state.liked);
     createCommentCallback = () => {
         this.createComment(this.props.id, this.props.token, this.state.pendingComment.trim());
@@ -371,7 +385,8 @@ class Post extends Component {
                         content={this.state.pendingCaption} />
                     {this.props.comments.map(comment => 
                         <Comment {...comment} key={comment.id} 
-                            canEdit={comment.username === this.props.sessionUser} />)}
+                            canEdit={comment.username === this.props.sessionUser}
+                            handleDelete={() => this.deleteComment(comment.id, this.props.token)} />)}
                 </div>
                 <CommentInput ref={input => this.commentInput = input}
                     onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}

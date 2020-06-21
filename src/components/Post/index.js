@@ -94,6 +94,11 @@ class Comment extends Component {
         this.inputField = undefined;
         this.submitBtn = undefined;
         this.visible = true;
+        this.state = {
+            ...props, 
+            isEditing: this.props.isEditing !== undefined ? this.props.isEditing : false,
+            value: this.props.content
+        };
     }
 
     onHover = () => {
@@ -125,6 +130,10 @@ class Comment extends Component {
         }
     }
 
+    handleChange = () => {
+        this.setState({ value: this.inputField.value });
+    }
+
     render() {
         return (
             <div className="d-flex justify-content-between align-items-center mt-1" onMouseOver={this.onHover} onMouseLeave={this.onHoverExit}>
@@ -133,18 +142,19 @@ class Comment extends Component {
                     {this.props.isEditing ?
                         <div className="d-flex w-100">
                             <input ref={input => this.inputField = input} type="text"
-                                class="form-control d-inline ml-1 px-2" value={this.props.content}
-                                onChange={this.props.handleChange}
+                                class="form-control d-inline ml-1 px-2" value={this.props.handleChange ? this.props.content : this.state.value}
+                                onChange={this.props.handleChange ? this.props.handleChange : this.handleChange}
                                 onBlur={this.onInputFocusLost}
                             />
-                            <button ref={btn => this.submitBtn = btn} className="btn btn-md btn-success" disabled={this.props.canCommitEdit === false} onClick={this.props.handleCommitEdit}>
+                            <button ref={btn => this.submitBtn = btn} className="btn btn-md btn-success" 
+                                disabled={this.props.canCommitEdit === false} onClick={this.props.handleCommitEdit}>
                                 <i class="fas fa-check fa-sm"></i>
                             </button>
                         </div>
                         : <span className="card-text ml-1">{this.props.content}</span>
                     }
                 </div>
-                {this.visible && this.props.canEdit ?
+                {this.visible && this.props.canEdit && this.props.isEditing === false ?
                     <div className="d-none" ref={div => this.optionButton = div} >
                         <button className="nav-link p-0 fas fa-ellipsis-h fa-md text-dark bg-transparent border-0"
                             id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -239,10 +249,12 @@ class Post extends Component {
             liked: this.props.likedBy.some(like => like.username === this.props.sessionUser),
             pendingComment: "",
             isEditing: false,
-            pendingCaption: this.props.caption
+            pendingCaption: this.props.caption,
+            editingComment: -1
         };
         this.commentInput = undefined;
         this.captionInput = undefined;
+        this.editingComment = undefined;
     }
 
     commitLike = (postId, token, willLike) => {
@@ -283,6 +295,23 @@ class Post extends Component {
                 })
             }).then(() => {
                 this.setState({ pendingCaption: caption, isEditing: false });
+                this.props.updatePosts();
+            });
+    }
+
+    editComment = (commentId, token, comment) => {
+        fetch(`${Constant.host}/comments/${commentId}?key=${token}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: commentId,
+                    content: comment
+                })
+            }).then(() => {
+                this.setState({ editingComment: -1 });
                 this.props.updatePosts();
             });
     }
@@ -349,9 +378,16 @@ class Post extends Component {
                                 handleChange={() => this.setState({ pendingCaption: this.captionInput.inputField.value })}
                                 canCommitEdit={this.props.caption !== this.state.pendingCaption}
                                 handleCommitEdit={this.editCaptionCallback}
-                                handleEditExit={() => setTimeout(100, () => this.setState({ isEditing: false, pendingCaption: this.props.caption }))}
+                                handleEditExit={() => this.setState({ isEditing: false, pendingCaption: this.props.caption })}
                                 content={this.state.pendingCaption} />
-                            {this.props.comments.map(comment => <Comment {...comment} key={comment.id} canEdit={comment.username === this.props.sessionUser} />)}
+                            {this.props.comments.map(comment => 
+                                <Comment {...comment} key={comment.id} 
+                                    ref={ this.state.editingComment === comment.id ? cmt => this.editingComment = cmt : undefined}
+                                    canEdit={comment.username === this.props.sessionUser}
+                                    handleEdit={() => this.setState({ editingComment: comment.id })}
+                                    isEditing={this.state.editingComment === comment.id}
+                                    handleCommitEdit={() => this.editComment(comment.id, this.props.token, this.editingComment.state.value)}
+                                    handleDelete={() => this.deleteComment(comment.id, this.props.token)} />)}
                         </div>
                         <CommentInput ref={input => this.commentInput = input}
                             onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}
@@ -385,7 +421,11 @@ class Post extends Component {
                         content={this.state.pendingCaption} />
                     {this.props.comments.map(comment => 
                         <Comment {...comment} key={comment.id} 
+                            ref={ this.state.editingComment === comment.id ? cmt => this.editingComment = cmt : undefined}
                             canEdit={comment.username === this.props.sessionUser}
+                            handleEdit={() => this.setState({ editingComment: comment.id })}
+                            isEditing={this.state.editingComment === comment.id}
+                            handleCommitEdit={() => this.editComment(comment.id, this.props.token, this.editingComment.state.value)}
                             handleDelete={() => this.deleteComment(comment.id, this.props.token)} />)}
                 </div>
                 <CommentInput ref={input => this.commentInput = input}

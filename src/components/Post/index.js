@@ -5,14 +5,14 @@ class User extends Component {
     render() {
         return (
             <div className="header container p-2 my-1 d-flex align-items-center justify-content-between">
-                    <a className="d-flex align-items-center text-decoration-none text-dark ml-1 insta-bold" href={`/${this.props.username}`} aria-haspopup="true" aria-expanded="false"
-                        style={{ fontSize: ".9rem" }}>
-                        <img src={`${Constant.host}${this.props.userAvatar}`} 
-                            className="img-fluid rounded-circle mr-2 ml-1" 
-                            style={{ objectFit: "cover", width: "35px", height: "35px" }} 
-                            alt="" />
-                        <span className="ml-1">{this.props.username}</span>
-                    </a>
+                <a className="d-flex align-items-center text-decoration-none text-dark ml-1 insta-bold" href={`/${this.props.username}`} aria-haspopup="true" aria-expanded="false"
+                    style={{ fontSize: ".9rem" }}>
+                    <img src={`${Constant.host}${this.props.userAvatar}`}
+                        className="img-fluid rounded-circle mr-2 ml-1"
+                        style={{ objectFit: "cover", width: "35px", height: "35px" }}
+                        alt="" />
+                    <span className="ml-1">{this.props.username}</span>
+                </a>
                 <OptionDropdown />
             </div>
         );
@@ -24,7 +24,7 @@ class PhotoList extends Component {
         const carouselId = `pcrs_${this.props.postId}`;
         if (this.props.photos.length > 1)
             return (
-                <div id={carouselId} className="carousel slide" data-ride="carousel" data-interval="0" onDoubleClick={this.props.onLike}>
+                <div id={carouselId} className={`carousel slide p-0 ${this.props.isHorizontal ? "col-sm-7" : ""}`} data-ride="carousel" data-interval="0" onDoubleClick={this.props.onLike}>
                     <ol className="carousel-indicators">
                         {this.props.photos.map((photo, index) => {
                             if (index === 0) {
@@ -59,8 +59,8 @@ class PhotoList extends Component {
 
             );
         else {
-            return (<div onDoubleClick={this.props.onLike}>
-                {this.props.photos.map(photo => <img src={`${Constant.host}${photo.link}`} className="card-img-top" alt="A photo" />)}
+            return (<div onDoubleClick={this.props.onLike} className={`${this.props.isHorizontal ? "col-sm-7" : ""} p-0`}>
+                {this.props.photos.map(photo => <img src={`${Constant.host}${photo.link}`} className="card-img-top" alt="redundant-alt" />)}
             </div>)
         }
     }
@@ -87,18 +87,63 @@ class Reaction extends Component {
 }
 
 class Comment extends Component {
+    constructor(props) {
+        super(props);
+        this.optionButton = undefined;
+        this.visible = true;
+    }
+
+    onHover = () => {
+        if (this.optionButton) {
+            this.optionButton.classList.remove("d-none");
+        }
+    }
+
+    onHoverExit = () => {
+        if (this.optionButton) {
+            this.optionButton.classList.add("d-none");
+            if (this.optionButton.classList.contains("show")) {
+                this.optionButton.classList.remove("show");
+                this.optionButton.querySelector(".dropdown-menu").classList.remove("show");
+            }
+        }
+    }
+
     render() {
         return (
-            <div>
-                <a className="insta-bold text-decoration-none text-dark" href={`/${this.props.username}`}>{this.props.username}</a>
-                <span className="card-text ml-1">{this.props.content}</span>
+            <div className="d-flex justify-content-between align-items-center mt-1" onMouseOver={this.onHover} onMouseLeave={this.onHoverExit}>
+                <div>
+                    <a className="insta-bold text-decoration-none text-dark" href={`/${this.props.username}`}>{this.props.username}</a>
+                    <span className="card-text ml-1">{this.props.content}</span>
+                </div>
+                {this.visible ?
+                    <div className="d-none" ref={div => this.optionButton = div} >
+                        <button className="nav-link p-0 fas fa-ellipsis-h fa-md text-dark bg-transparent border-0"
+                            id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <button className="dropdown-item row m-0 pl-2">
+                                <i className="fas fa-edit fa-sm col-sm-4"></i>
+                            Edit
+                        </button>
+                            <button className="dropdown-item row m-0 pl-2">
+                                <i className="fas fa-times fa-sm col-sm-4"></i>
+                            Delete
+                    </button>
+                        </div>
+                    </div>
+                    : ""
+                }
             </div>
         )
     }
 }
 
 class Caption extends Comment {
-
+    constructor(props) {
+        super(props);
+        this.visible = false;
+    }
 }
 
 class CommentInput extends Component {
@@ -117,9 +162,9 @@ class CommentInput extends Component {
     render() {
         return (
             <div className="card-footer text-muted px-0 py-0 d-flex">
-                <input ref={inputField => this.inputField = inputField} 
-                    onChange={this.props.onChange} type="text" 
-                    className="form-control border border-white" placeholder="Add a comment..." 
+                <input ref={inputField => this.inputField = inputField}
+                    onChange={this.props.onChange} type="text"
+                    className="form-control border border-white" placeholder="Add a comment..."
                     value={this.props.value}
                     onKeyDown={this.onKeyDown} />
                 <button className="btn btn-white text-primary" onClick={this.props.onSubmitComment}>Post</button>
@@ -136,9 +181,13 @@ class OptionDropdown extends Component {
                 </button>
                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                     <button className="dropdown-item row m-0 pl-2">
+                        <i className="fas fa-external-link-alt fa-sm col-sm-4"></i>
+                            View full post
+                    </button>
+                    <button className="dropdown-item row m-0 pl-2">
                         <i className="fas fa-edit fa-sm col-sm-4"></i>
                             Edit
-                        </button>
+                    </button>
                     <button className="dropdown-item row m-0 pl-2">
                         <i className="fas fa-times fa-sm col-sm-4"></i>
                             Delete
@@ -163,26 +212,26 @@ class Post extends Component {
     commitLike = (postId, token, willLike) => {
         console.log(`${this.props.id} is${this.state.liked ? "" : " not"} liked!`)
         fetch(`${Constant.host}/posts/${postId}/likes?key=${token}`,
-        {
-            method: willLike ? "POST" : "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(this.props.updatePosts);
+            {
+                method: willLike ? "POST" : "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(this.props.updatePosts);
     };
 
     createComment = (postId, token, comment) => {
         fetch(`${Constant.host}/posts/${postId}/comments?key=${token}`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                postId: postId,
-                content: comment
-            })
-        }).then(this.props.updatePosts);
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    postId: postId,
+                    content: comment
+                })
+            }).then(this.props.updatePosts);
     };
 
     commitLikeCallback = () => this.commitLike(this.props.id, this.props.token, this.state.liked);
@@ -192,24 +241,48 @@ class Post extends Component {
     }
 
     render() {
+        if (this.props.isHorizontal) {
+            return (
+                <div className="card container p-0 my-3 d-flex flex-row">
+                    <PhotoList photos={this.props.photos} postId={this.props.id} isHorizontal={this.props.isHorizontal}
+                        onLike={() => { this.setState({ liked: true }, this.commitLikeCallback) }} />
+                    <div className="col-sm-5">
+                        <User username={this.props.username} userAvatar={this.props.userAvatar} />
+                        <div className="card-body px-3 py-2">
+                            <Reaction likeCount={this.props.likeCount}
+                                commentCount={this.props.commentCount}
+                                liked={this.state.liked}
+                                onLikeClicked={() => { this.setState({ liked: !this.state.liked }, this.commitLikeCallback) }}
+                                onCommentClicked={() => { this.commentInput.focus() }} />
+                            <Caption content={this.props.caption} username={this.props.username} />
+                            {this.props.comments.map(comment => <Comment {...comment} key={comment.id} />)}
+                        </div>
+                        <CommentInput ref={input => this.commentInput = input}
+                            onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}
+                            value={this.state.pendingComment}
+                            onSubmitComment={this.createCommentCallback} />
+                    </div>
+                </div>
+            )
+        }
         return (
             <div className="card container w-50 p-0 my-3">
                 <User username={this.props.username} userAvatar={this.props.userAvatar} />
-                <PhotoList photos={this.props.photos} postId={this.props.id} 
-                    onLike={() => {this.setState({liked: true}, this.commitLikeCallback)}} />
+                <PhotoList photos={this.props.photos} postId={this.props.id}
+                    onLike={() => { this.setState({ liked: true }, this.commitLikeCallback) }} />
                 <div className="card-body px-3 py-2">
                     <Reaction likeCount={this.props.likeCount}
                         commentCount={this.props.commentCount}
                         liked={this.state.liked}
-                        onLikeClicked={() => {this.setState({liked: !this.state.liked}, this.commitLikeCallback)}}
-                        onCommentClicked={() => {this.commentInput.focus()}} />
+                        onLikeClicked={() => { this.setState({ liked: !this.state.liked }, this.commitLikeCallback) }}
+                        onCommentClicked={() => { this.commentInput.focus() }} />
                     <Caption content={this.props.caption} username={this.props.username} />
                     {this.props.comments.map(comment => <Comment {...comment} key={comment.id} />)}
                 </div>
-                <CommentInput ref={input => this.commentInput = input} 
+                <CommentInput ref={input => this.commentInput = input}
                     onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}
-                    value={this.state.pendingComment} 
-                    onSubmitComment={this.createCommentCallback}/>
+                    value={this.state.pendingComment}
+                    onSubmitComment={this.createCommentCallback} />
             </div>
         );
     }

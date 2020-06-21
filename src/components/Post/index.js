@@ -13,7 +13,8 @@ class User extends Component {
                         alt="" />
                     <span className="ml-1">{this.props.username}</span>
                 </a>
-                <OptionDropdown />
+                <OptionDropdown canEdit={this.props.canEdit} handleViewFullPost={this.props.handleViewFullPost}
+                    handleDelete={this.props.handleDelete} handleEdit={this.props.handleEdit} />
             </div>
         );
     }
@@ -37,12 +38,12 @@ class PhotoList extends Component {
                     <div className="carousel-inner" role="listbox">
                         {this.props.photos.map((photo, index) => {
                             if (index === 0) {
-                                return <div className="carousel-item active">
-                                    <img className="d-block w-100" src={`${Constant.host}${photo.link}`} alt="First slide" key="0" />
+                                return <div className="carousel-item active" key="0">
+                                    <img className="d-block w-100" src={`${Constant.host}${photo.link}`} alt="First slide" />
                                 </div>;
                             } else {
-                                return <div className="carousel-item">
-                                    <img className="d-block w-100" src={`${Constant.host}${photo.link}`} alt="First slide" key={index} />
+                                return <div className="carousel-item" key={index}>
+                                    <img className="d-block w-100" src={`${Constant.host}${photo.link}`} alt="First slide" />
                                 </div>;
                             }
                         })}
@@ -90,6 +91,7 @@ class Comment extends Component {
     constructor(props) {
         super(props);
         this.optionButton = undefined;
+        this.inputField = undefined;
         this.visible = true;
     }
 
@@ -109,14 +111,32 @@ class Comment extends Component {
         }
     }
 
+    componentDidUpdate() {
+        if (this.inputField) {
+            this.inputField.focus();
+        }
+    }
+
     render() {
         return (
             <div className="d-flex justify-content-between align-items-center mt-1" onMouseOver={this.onHover} onMouseLeave={this.onHoverExit}>
-                <div>
+                <div className="d-flex align-items-center mt-1 w-100">
                     <a className="insta-bold text-decoration-none text-dark" href={`/${this.props.username}`}>{this.props.username}</a>
-                    <span className="card-text ml-1">{this.props.content}</span>
+                    {this.props.isEditing ?
+                        <div className="d-flex w-100">
+                            <input ref={input => this.inputField = input} type="text"
+                                class="form-control d-inline ml-1 px-2" value={this.props.content}
+                                onChange={this.props.handleChange}
+                                onBlur={this.props.handleEditExit}
+                            />
+                            <button className="btn btn-md btn-success" disabled={this.props.canCommitEdit === false} onClick={this.props.handleCommitEdit}>
+                                <i class="fas fa-check fa-sm"></i>
+                            </button>
+                        </div>
+                        : <span className="card-text ml-1">{this.props.content}</span>
+                    }
                 </div>
-                {this.visible ?
+                {this.visible && this.props.canEdit ?
                     <div className="d-none" ref={div => this.optionButton = div} >
                         <button className="nav-link p-0 fas fa-ellipsis-h fa-md text-dark bg-transparent border-0"
                             id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -180,18 +200,23 @@ class OptionDropdown extends Component {
                 <button className="nav-link fas fa-ellipsis-h fa-md mr-n2 text-dark bg-transparent border-0" href="#" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </button>
                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                    <button className="dropdown-item row m-0 pl-2">
+                    <button className="dropdown-item row m-0 pl-2" onClick={this.props.handleViewFullPost}>
                         <i className="fas fa-external-link-alt fa-sm col-sm-4"></i>
                             View full post
                     </button>
-                    <button className="dropdown-item row m-0 pl-2">
-                        <i className="fas fa-edit fa-sm col-sm-4"></i>
-                            Edit
-                    </button>
-                    <button className="dropdown-item row m-0 pl-2">
-                        <i className="fas fa-times fa-sm col-sm-4"></i>
-                            Delete
-                    </button>
+                    {this.props.canEdit ?
+                        <>
+                            <button className="dropdown-item row m-0 pl-2" onClick={this.props.handleEdit}>
+                                <i className="fas fa-edit fa-sm col-sm-4"></i>
+                                    Edit
+                            </button>
+                            <button className="dropdown-item row m-0 pl-2" onClick={this.props.handleDelete}>
+                                <i className="fas fa-times fa-sm col-sm-4"></i>
+                                    Delete
+                            </button>
+                        </>
+                        : ""
+                    }
                 </div>
             </div>
         )
@@ -204,9 +229,12 @@ class Post extends Component {
         this.state = {
             ...props,
             liked: this.props.likedBy.some(like => like.username === this.props.sessionUser),
-            pendingComment: ""
+            pendingComment: "",
+            isEditing: false,
+            pendingCaption: this.props.caption
         };
         this.commentInput = undefined;
+        this.captionInput = undefined;
     }
 
     commitLike = (postId, token, willLike) => {
@@ -234,10 +262,30 @@ class Post extends Component {
             }).then(this.props.updatePosts);
     };
 
+    editCaption = (postId, token, caption) => {
+        fetch(`${Constant.host}/posts/${postId}?key=${token}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: postId,
+                    caption: caption
+                })
+            }).then(() => {
+                this.setState({ pendingCaption: caption, isEditing: false });
+                return this.props.updatePosts;
+            });
+    }
+
     commitLikeCallback = () => this.commitLike(this.props.id, this.props.token, this.state.liked);
     createCommentCallback = () => {
         this.createComment(this.props.id, this.props.token, this.state.pendingComment.trim());
         this.setState({ pendingComment: "" });
+    }
+    editCaptionCallback = () => {
+        this.editCaption(this.props.id, this.props.token, this.state.pendingCaption.trim());
     }
 
     render() {
@@ -247,15 +295,23 @@ class Post extends Component {
                     <PhotoList photos={this.props.photos} postId={this.props.id} isHorizontal={this.props.isHorizontal}
                         onLike={() => { this.setState({ liked: true }, this.commitLikeCallback) }} />
                     <div className="col-sm-5">
-                        <User username={this.props.username} userAvatar={this.props.userAvatar} />
+                        <User username={this.props.username} userAvatar={this.props.userAvatar}
+                            canEdit={this.props.canEdit} handleEdit={() => this.setState({ isEditing: !this.state.isEditing })} />
                         <div className="card-body px-3 py-2">
                             <Reaction likeCount={this.props.likeCount}
                                 commentCount={this.props.commentCount}
                                 liked={this.state.liked}
                                 onLikeClicked={() => { this.setState({ liked: !this.state.liked }, this.commitLikeCallback) }}
                                 onCommentClicked={() => { this.commentInput.focus() }} />
-                            <Caption content={this.props.caption} username={this.props.username} />
-                            {this.props.comments.map(comment => <Comment {...comment} key={comment.id} />)}
+                            <Caption ref={input => this.captionInput = input}
+                                isEditing={this.state.isEditing} 
+                                username={this.props.username}
+                                handleChange={() => this.setState({ pendingCaption: this.captionInput.inputField.value })}
+                                canCommitEdit={this.props.caption !== this.state.pendingCaption}
+                                handleCommitEdit={this.editCaptionCallback}
+                                handleEditExit={() => setTimeout(100, () => this.setState({ isEditing: false, pendingCaption: this.props.caption }))}
+                                content={this.state.pendingCaption} />
+                            {this.props.comments.map(comment => <Comment {...comment} key={comment.id} canEdit={comment.username === this.props.sessionUser} />)}
                         </div>
                         <CommentInput ref={input => this.commentInput = input}
                             onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}
@@ -263,11 +319,12 @@ class Post extends Component {
                             onSubmitComment={this.createCommentCallback} />
                     </div>
                 </div>
-            )
+            );
         }
         return (
             <div className="card container w-50 p-0 my-3">
-                <User username={this.props.username} userAvatar={this.props.userAvatar} />
+                <User username={this.props.username} userAvatar={this.props.userAvatar}
+                    canEdit={this.props.canEdit} handleEdit={() => this.setState({ isEditing: !this.state.isEditing })} />
                 <PhotoList photos={this.props.photos} postId={this.props.id}
                     onLike={() => { this.setState({ liked: true }, this.commitLikeCallback) }} />
                 <div className="card-body px-3 py-2">
@@ -276,8 +333,15 @@ class Post extends Component {
                         liked={this.state.liked}
                         onLikeClicked={() => { this.setState({ liked: !this.state.liked }, this.commitLikeCallback) }}
                         onCommentClicked={() => { this.commentInput.focus() }} />
-                    <Caption content={this.props.caption} username={this.props.username} />
-                    {this.props.comments.map(comment => <Comment {...comment} key={comment.id} />)}
+                    <Caption ref={input => this.captionInput = input}
+                        isEditing={this.state.isEditing} 
+                        username={this.props.username}
+                        handleChange={() => this.setState({ pendingCaption: this.captionInput.inputField.value })}
+                        canCommitEdit={this.props.caption !== this.state.pendingCaption}
+                        handleCommitEdit={this.editCaptionCallback}
+                        handleEditExit={() => setTimeout(100, () => this.setState({ isEditing: false, pendingCaption: this.props.caption }))}
+                        content={this.state.pendingCaption} />
+                    {this.props.comments.map(comment => <Comment {...comment} key={comment.id} canEdit={comment.username === this.props.sessionUser} />)}
                 </div>
                 <CommentInput ref={input => this.commentInput = input}
                     onChange={() => this.setState({ pendingComment: this.commentInput.inputField.value })}

@@ -47,7 +47,7 @@ class NewsFeed extends Component {
     render() {
         return (
             <>
-                {this.state.posts.map(post => <Post {...post} key={post.id} updatePosts={this.updatePosts} sessionUser={this.props.username} token={this.props.token} />)}
+                {this.state.posts.map(post => <Post {...post} key={post.id} updatePosts={this.updatePosts} sessionUser={this.props.username} token={this.props.token} canEdit={post.username === this.props.username} />)}
             </>
         );
     }

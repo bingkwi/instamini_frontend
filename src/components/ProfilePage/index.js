@@ -36,8 +36,6 @@ class Counting extends Component {
     }
 }
 
-
-
 class Profile extends Component {
     render() {
         return (
@@ -58,8 +56,6 @@ class Profile extends Component {
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
         );

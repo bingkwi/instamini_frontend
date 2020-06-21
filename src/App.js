@@ -8,7 +8,8 @@ import OnePost from './components/OnePost';
 import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
 // import Constants from './utils/Constants'
-import LoginPage from './pages';
+import LoginPage from './pages/LoginPage';
+import Thumbnail from './components/Thumbnail';
 
 class App extends React.Component {
 
@@ -57,10 +58,10 @@ class App extends React.Component {
     return (
       <div>
         <NavigationBar displayName="Quynh Bich" />
-        {this.state.username && this.state.token && this.state.userLink ? 
+        {/* {this.state.username && this.state.token && this.state.userLink ? 
           <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
           : ""
-        }
+        } */}
         {/* <section class="container-proflie">
           <Profile
             photo={{
@@ -137,6 +138,10 @@ class App extends React.Component {
         </section> */}
 
         {/* <LoginPage />  */}
+
+        <Thumbnail 
+        
+        />
       </div>
     );
   }

@@ -29,3 +29,17 @@ span {
   height: 10px;
   border-radius: 100%;
 }
+
+.reaction {
+  position: absolute;
+  top: 50%;
+  z-index: inherit;
+  color: white;
+  text-align: center;
+  width: 100%;
+}
+
+/* .card:hover img {
+  background-color: rgba(0,0,0,.5);
+  opacity: .5;
+} */

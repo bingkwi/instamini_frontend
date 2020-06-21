@@ -9,6 +9,7 @@ import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
 // import Constants from './utils/Constants'
 import LoginPage from './pages';
+import FullPost from './pages/FullPost';
 
 class App extends React.Component {
 
@@ -57,8 +58,13 @@ class App extends React.Component {
     return (
       <div>
         <NavigationBar displayName="Quynh Bich" />
-        {this.state.username && this.state.token && this.state.userLink ? 
+        {/* {this.state.username && this.state.token && this.state.userLink ? 
           <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+          : ""
+        } */}
+        {
+          this.state.username && this.state.token && this.state.userLink ?
+          <FullPost id="1" username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
           : ""
         }
         {/* <section class="container-proflie">

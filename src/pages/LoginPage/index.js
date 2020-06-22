@@ -36,6 +36,9 @@ class SignUpPage extends Component {
                 <div className="form-group">
                     <input type="password" className="form-control" placeholder="Password" id="pwd" />
                 </div>
+                <div className="form-group">
+                    <input type="password" className="form-control" placeholder="Confirm password" id="pwd" />
+                </div>
             
 
             <button type="submit" className="btn btn-success">Sign Up</button>

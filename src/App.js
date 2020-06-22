@@ -8,13 +8,9 @@ import OnePost from './components/OnePost';
 import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
 // import Constants from './utils/Constants'
-<<<<<<< HEAD
 import LoginPage from './pages/LoginPage';
 import Thumbnail from './components/Thumbnail';
-=======
-import LoginPage from './pages';
-import FullPost from './pages/FullPost';
->>>>>>> 45579c55ec669964a727c57108cb06c7ae04a4d6
+import Gallery from './components/Thumbnail';
 
 class App extends React.Component {
 
@@ -44,7 +40,7 @@ class App extends React.Component {
         return res.json();
       }
       return Promise.resolve({
-        tokenResponse : {}
+        tokenResponse: {}
       })
     }).then(tokenResponse => {
       this.setState({
@@ -67,14 +63,6 @@ class App extends React.Component {
           <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
           : ""
         } */}
-<<<<<<< HEAD
-=======
-        {
-          this.state.username && this.state.token && this.state.userLink ?
-          <FullPost id="1" username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-          : ""
-        }
->>>>>>> 45579c55ec669964a727c57108cb06c7ae04a4d6
         {/* <section class="container-proflie">
           <Profile
             photo={{
@@ -152,8 +140,13 @@ class App extends React.Component {
 
         {/* <LoginPage />  */}
 
-        <Thumbnail 
-        
+        <Gallery
+          post={{
+            username: "binh.dohai",
+            likeCount: 1,
+            commentCount: 2,
+            caption: "This is demo caption"
+          }}
         />
       </div>
     );

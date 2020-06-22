@@ -9,7 +9,7 @@ class NavigationBar extends Component {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mr-auto d-flex justify-content-between w-100">
                             <li className="nav-item active">
-                                <a className="nav-link" href="#">Instamini<span className="sr-only">(current)</span></a>
+                                <a className="nav-link" href="/">Instamini<span className="sr-only">(current)</span></a>
                             </li>
                             <li>
                                 <form className="form-inline my-2 my-lg-0">
@@ -17,14 +17,14 @@ class NavigationBar extends Component {
                                     <button className="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
                                 </form>
                             </li>
-                            <li className="nav-item dropdown d-flex align-items-center">
-                                <img src="./images/test.jpg" className="img-fluid rounded-circle mr-2" style={{objectFit: "cover", width: "35px", height: "35px"}} alt=""/>
-                                    <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {this.props.displayName.concat(" ")} </a>
-                                    <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a className="dropdown-item" href="#">Profile</a>
-                                        <a className="dropdown-item" href="#">Log out</a>
-                                    </div>
+                            <li className="nav-item dropdown ">
+                                <button className="nav-link dropdown-toggle btn d-flex align-items-center p-0" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img src="./images/test.jpg" className="img-fluid rounded-circle mr-3" style={{ objectFit: "cover", width: "35px", height: "35px" }} alt="" />
+                                    {this.props.displayName.concat(" ")} </button>
+                                <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <button className="dropdown-item" onClick={this.props.handleNavigateToProfile}>Profile</button>
+                                    <button className="dropdown-item" onClick={this.props.handleLogout}>Log out</button>
+                                </div>
                             </li>
                         </ul>
                     </div>

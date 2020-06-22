@@ -13,7 +13,7 @@ class User extends Component {
                         alt="" />
                     <span className="ml-1">{this.props.username}</span>
                 </a>
-                <OptionDropdown canEdit={this.props.canEdit} handleViewFullPost={this.props.handleViewFullPost}
+                <OptionDropdown isHorizontal={this.props.isHorizontal} canEdit={this.props.canEdit} handleViewFullPost={this.props.handleViewFullPost}
                     handleDelete={this.props.handleDelete} handleEdit={this.props.handleEdit} />
             </div>
         );
@@ -218,10 +218,12 @@ class OptionDropdown extends Component {
                 <button className="nav-link fas fa-ellipsis-h fa-md mr-n2 text-dark bg-transparent border-0" href="#" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </button>
                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                    <button className="dropdown-item row m-0 pl-2" onClick={this.props.handleViewFullPost}>
-                        <i className="fas fa-external-link-alt fa-sm col-sm-4"></i>
-                            View full post
-                    </button>
+                    {this.props.isHorizontal ? "" :
+                        <button className="dropdown-item row m-0 pl-2" onClick={this.props.handleViewFullPost}>
+                            <i className="fas fa-external-link-alt fa-sm col-sm-4"></i>
+                                View full post
+                        </button>
+                    }
                     {this.props.canEdit ?
                         <>
                             <button className="dropdown-item row m-0 pl-2" onClick={this.props.handleEdit}>
@@ -344,6 +346,10 @@ class Post extends Component {
             }).then(this.props.updatePosts);
     }
 
+    viewFullPost = (id) => {
+        window.location.href = `/posts/${id}`;
+    }
+
     commitLikeCallback = () => this.commitLike(this.props.id, this.props.token, this.state.liked);
     createCommentCallback = () => {
         this.createComment(this.props.id, this.props.token, this.state.pendingComment.trim());
@@ -355,6 +361,7 @@ class Post extends Component {
     deletePostCallback = () => {
         this.deletePost(this.props.id, this.props.token);
     }
+    viewFullPostCallback = () => this.viewFullPost(this.props.id);
 
     render() {
         if (this.props.isHorizontal) {
@@ -365,7 +372,8 @@ class Post extends Component {
                     <div className="col-sm-5">
                         <User 
                             username={this.props.username} userAvatar={this.props.userAvatar} canEdit={this.props.canEdit} 
-                            handleEdit={() => this.setState({ isEditing: !this.state.isEditing })} />
+                            handleEdit={() => this.setState({ isEditing: !this.state.isEditing })}
+                            isHorizontal={this.props.isHorizontal} />
                         <div className="card-body px-3 py-2">
                             <Reaction likeCount={this.props.likeCount}
                                 commentCount={this.props.commentCount}
@@ -402,7 +410,8 @@ class Post extends Component {
                 <User 
                     username={this.props.username} userAvatar={this.props.userAvatar} canEdit={this.props.canEdit} 
                     handleEdit={() => this.setState({ isEditing: !this.state.isEditing })}
-                    handleDelete={this.deletePostCallback} />
+                    handleDelete={this.deletePostCallback}
+                    handleViewFullPost={this.viewFullPostCallback} />
                 <PhotoList photos={this.props.photos} postId={this.props.id}
                     onLike={() => { this.setState({ liked: true }, this.commitLikeCallback) }} />
                 <div className="card-body px-3 py-2">

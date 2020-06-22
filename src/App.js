@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import Thumbnail from './components/Thumbnail';
 import FullPost from './pages/FullPost';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Gallery from './components/Thumbnail';
 
 class App extends React.Component {
 
@@ -43,7 +44,7 @@ class App extends React.Component {
         return res.json();
       }
       return Promise.resolve({
-        tokenResponse : {}
+        tokenResponse: {}
       })
     }).then(tokenResponse => {
       this.setState({
@@ -85,23 +86,6 @@ class App extends React.Component {
       });
     });
     // this.setState({ loading: false });
-  }
-
-  logout = () => {
-    this.setState({ loading: true });
-    const token = this.getCookie("Token") ? this.getCookie("Token") : "";
-    fetch(`${Constant.host}/session?key=${token}`, {
-      method: "DELETE",
-      credentials: 'include'
-    }).then(() => {
-      this.setState({
-        loading: false,
-        username: undefined,
-        displayName: undefined,
-        token: undefined,
-        userLink: undefined
-      });
-    })
   }
 
   navigateToProfile = username => {
@@ -231,6 +215,15 @@ class App extends React.Component {
       //   {/* <Thumbnail 
         
       //   /> */}
+      // </div>
+        // <Gallery
+        //   post={{
+        //     username: "binh.dohai",
+        //     likeCount: 1,
+        //     commentCount: 2,
+        //     caption: "This is demo caption"
+        //   }}
+        // />
       // </div>
     );
   }

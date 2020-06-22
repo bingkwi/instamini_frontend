@@ -2,16 +2,16 @@ import React from 'react';
 import './App.css';
 import NavigationBar from './components/NavigationBar';
 import Post from './components/Post';
-import Profile from './components/ProfilePage';
+import Profile from './components/ProfileSection';
 import Box from './components/PostInput';
 import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
 // import Constants from './utils/Constants'
 import LoginPage from './pages/LoginPage';
-import Thumbnail from './components/Thumbnail';
 import FullPost from './pages/FullPost';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Gallery from './components/Thumbnail';
+import Gallery from './components/Gallery';
+import ProfilePage from './pages/ProfilePage';
 
 class App extends React.Component {
 
@@ -58,7 +58,7 @@ class App extends React.Component {
     this.setState({ loading: false });
   }
 
-  getCookie = function(name) {
+  getCookie = function (name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     if (match) return match[2];
   }
@@ -119,133 +119,124 @@ class App extends React.Component {
 
   render() {
     return (
-      <Router>
-        <Route path="/">
-          {this.state.username && this.state.token && this.state.userLink ? 
-            <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
-              handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback} />
+      // <Router>
+      //   <Route path="/">
+      //     {this.state.username && this.state.token && this.state.userLink ? 
+      //       <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
+      //         handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback} />
+      //       : ""
+      //     }
+      //   </Route>
+      //   <Switch>
+      //     <Route exact path="/">
+      //       {this.state.loading === true ? "" :
+      //       (this.state.username && this.state.token && this.state.userLink ?
+      //         <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+      //         : <LoginPage isSignup={false} handleLogin={this.login} />)
+      //       }
+      //     </Route>
+      //     <Route path="/posts/:id" render={ ({match}) =>
+      //       this.state.username && this.state.token && this.state.userLink ?
+      //       <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+      //       : ""
+      //     }>
+      //     </Route>
+      //     <Route path="/:username" render={ ({match}) => {}}></Route>
+      //   </Switch>
+      // </Router>
+
+      <div>
+        <NavigationBar displayName="Quynh Bich" />
+        {/* {this.state.username && this.state.token && this.state.userLink ? 
+          <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+          : ""
+        } */}
+        {
+          this.state.username && this.state.token && this.state.userLink ?
+            <FullPost id="1" username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
             : ""
-          }
-        </Route>
-        <Switch>
-          <Route exact path="/">
-            {this.state.loading === true ? "" :
-            (this.state.username && this.state.token && this.state.userLink ?
-              <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-              : <LoginPage isSignup={false} handleLogin={this.login} />)
+        }
+        <section class="container-proflie">
+          <Profile
+            photo={{
+              photo: "./images/test.jpg"
+            }}
+
+            username={{
+              username: "binh.dohai",
+              displayName: "Quynh Bich"
+            }}
+
+            counting={{
+              post: 1,
+              followerCount: 2,
+              followingCount: 2
+            }}
+
+          />
+        </section>
+
+        {/* <section class="container">
+          <Box />
+        </section> */}
+
+        {/* <section class="container">
+          <Post
+            photos={[
+              {
+                link: "./images/test.jpg"
+              },
+              {
+                link: "./images/test.jpg"
+              },
+              {
+                link: "./images/test.jpg"
+              }
+            ]
             }
-          </Route>
-          <Route path="/posts/:id" render={ ({match}) =>
-            this.state.username && this.state.token && this.state.userLink ?
-            <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-            : ""
-          }>
-          </Route>
-          <Route path="/:username" render={ ({match}) => {}}></Route>
-        </Switch>
-      </Router>
+            comments={[
 
-      // <div>
-      //   <NavigationBar displayName="Quynh Bich" />
-      //   {/* {this.state.username && this.state.token && this.state.userLink ? 
-      //     <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-      //     : ""
-      //   } */}
-      //   {
-      //     this.state.username && this.state.token && this.state.userLink ?
-      //     <FullPost id="1" username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-      //     : ""
-      //   }
-      //   {/* <section class="container-proflie">
-      //     <Profile
-      //       photo={{
-      //         photo: "./images/test.jpg"
-      //       }}
+            ]}
+            post={{
+              username: "binh.dohai",
+              likeCount: 1,
+              commentCount: 2,
+              caption: "This is demo caption"
+            }}
+          />
+        </section> */}
 
-      //       username={{
-      //         username: "binh.dohai",
-      //         displayName: "Quynh Bich"
-      //       }}
+        {/* <LoginPage />  */}
 
-      //       counting={{
-      //         post: 1,
-      //         followerCount: 2,
-      //         followingCount: 2
-      //       }}
+        <section className="container">
+        {/* <Gallery
+           
+        /> */}
+        <ProfilePage posts={[
+            {
+              link: "./images/test.jpg",
+              likeCount: 1,
+              commentCount: 2,
+            },
+            {
+              link: "./images/test.jpg",
+              likeCount: 1,
+              commentCount: 2,
+            },
+            {
+              link: "./images/test.jpg",
+              likeCount: 1,
+              commentCount: 2,
+            },
+            {
+              link: "./images/test.jpg",
+              likeCount: 1,
+              commentCount: 2,
+            },
+          ]} />
+        </section>
+      </div>
 
-      //     />
-      //   </section>
-
-      //   <section class="container">
-      //     <Box />
-      //   </section>
-
-      //   <section class="container">
-      //     <Post
-      //       photos={[
-      //         {
-      //           link: "./images/test.jpg"
-      //         },
-      //         {
-      //           link: "./images/test.jpg"
-      //         },
-      //         {
-      //           link: "./images/test.jpg"
-      //         }
-      //       ]
-      //       }
-      //       comments={[
-
-      //       ]}
-      //       post={{
-      //         username: "binh.dohai",
-      //         likeCount: 1,
-      //         commentCount: 2,
-      //         caption: "This is demo caption"
-      //       }}
-      //     />
-      //   </section>
-
-      //   <section>
-      //     <OnePost
-      //       photos={[
-      //         {
-      //           link: "./images/test.jpg"
-      //         },
-      //         {
-      //           link: "./images/test.jpg"
-      //         },
-      //         {
-      //           link: "./images/test.jpg"
-      //         }
-      //       ]
-      //       }
-
-      //       post={{
-      //         username: "binh.dohai",
-      //         likeCount: 1,
-      //         commentCount: 2,
-      //         caption: "This is demo caption"
-      //       }}
-
-      //     />
-      //   </section> */}
-
-      //   {/* <LoginPage />  */}
-
-      //   {/* <Thumbnail 
-        
-      //   /> */}
-      // </div>
-        // <Gallery
-        //   post={{
-        //     username: "binh.dohai",
-        //     likeCount: 1,
-        //     commentCount: 2,
-        //     caption: "This is demo caption"
-        //   }}
-        // />
-      // </div>
     );
   }
 }

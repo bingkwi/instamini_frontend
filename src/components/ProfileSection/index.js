@@ -39,7 +39,7 @@ class Counting extends Component {
 class Profile extends Component {
     render() {
         return (
-            <div className="card container w-50 p-4">
+            <div className="card container w-50 p-4 mt-3">
                 <div className="d-flex" >
                     <Photo photo={this.props.photo.photo} />
                     <div>

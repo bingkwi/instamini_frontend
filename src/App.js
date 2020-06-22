@@ -4,7 +4,6 @@ import NavigationBar from './components/NavigationBar';
 import Post from './components/Post';
 import Profile from './components/ProfilePage';
 import Box from './components/PostInput';
-import OnePost from './components/OnePost';
 import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
 // import Constants from './utils/Constants'
@@ -23,6 +22,7 @@ class App extends React.Component {
       username: undefined,
       token: undefined,
       userLink: undefined,
+      avatarLink: undefined,
       loading: true
     };
   }
@@ -51,6 +51,7 @@ class App extends React.Component {
         username: tokenResponse.username,
         displayName: tokenResponse.displayName,
         token: tokenResponse.token,
+        avatarLink: tokenResponse.avatarLink,
         userLink: tokenResponse.link
       });
     });
@@ -82,10 +83,29 @@ class App extends React.Component {
         displayName: tokenResponse.displayName,
         token: tokenResponse.token,
         userLink: tokenResponse.link,
+        avatarLink: tokenResponse.avatarLink,
         loading: false
       });
     });
     // this.setState({ loading: false });
+  }
+
+  logout = () => {
+    this.setState({ loading: true });
+    const token = this.getCookie("Token") ? this.getCookie("Token") : "";
+    fetch(`${Constant.host}/session?key=${token}`, {
+      method: "DELETE",
+      credentials: 'include'
+    }).then(() => {
+      this.setState({
+        loading: false,
+        username: undefined,
+        displayName: undefined,
+        token: undefined,
+        userLink: undefined,
+        avatarLink: undefined
+      });
+    })
   }
 
   navigateToProfile = username => {
@@ -102,7 +122,8 @@ class App extends React.Component {
       <Router>
         <Route path="/">
           {this.state.username && this.state.token && this.state.userLink ? 
-            <NavigationBar displayName={this.state.username} handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback} />
+            <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
+              handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback} />
             : ""
           }
         </Route>

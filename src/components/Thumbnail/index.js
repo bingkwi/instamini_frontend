@@ -20,7 +20,7 @@ class Thumbnail extends Component {
     render() {
         return (
             <div className="col-md-4 col-sm-6 pb-5" >
-                <div className="card" style={{ width: "300px", height: "300px", cursor: "pointer", background: `url(${"./images/test.jpg"})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                <div className="card thumbnail" style={{ width: "300px", height: "300px", cursor: "pointer", background: `url(${"./images/test.jpg"})`, backgroundSize: "cover", backgroundPosition: "center" }}
                     onMouseEnter={this.handleMouseOver}
                     onMouseLeave={this.handleMouseLeave} >
                     {/* <img src="./images/test.jpg" className="w-100 h-100" style={{ objectFit: "cover" }} alt="" /> */}

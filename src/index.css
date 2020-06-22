@@ -39,7 +39,7 @@ span {
   width: 100%;
 }
 
-.card:hover {
+.thumbnail:hover {
   background-color: rgba(0,0,0,.5);
   opacity: .5;
 }

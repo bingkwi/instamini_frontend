@@ -14,6 +14,8 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Gallery from './components/Thumbnail';
 import SearchResultItem from './components/SearchResultItem';
 import SearchResult from './pages/SearchResult';
+import LoadingPage from './pages/LoadingPage';
+import Footer from './components/Footer';
 
 class App extends React.Component {
 
@@ -27,42 +29,43 @@ class App extends React.Component {
       avatarLink: undefined,
       loading: true,
       isSearching: false,
-      query: undefined
+      query: ''
     };
   }
 
   login = (username, password) => {
-    this.setState({ loading: true });
-    fetch(`${Constant.host}/session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password
-      }),
-      credentials: 'include'
-    }).then(res => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.resolve({
-        tokenResponse: {}
-      })
-    }).then(tokenResponse => {
-      this.setState({
-        username: tokenResponse.username,
-        displayName: tokenResponse.displayName,
-        token: tokenResponse.token,
-        avatarLink: tokenResponse.avatarLink,
-        userLink: tokenResponse.link
+    this.setState({ loading: true }, () => {
+      fetch(`${Constant.host}/session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        }),
+        credentials: 'include'
+      }).then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+        return Promise.resolve({
+          tokenResponse: {}
+        })
+      }).then(tokenResponse => {
+        this.setState({
+          username: tokenResponse.username,
+          displayName: tokenResponse.displayName,
+          token: tokenResponse.token,
+          avatarLink: tokenResponse.avatarLink,
+          userLink: tokenResponse.link
+        });
       });
+      window.setTimeout(() => this.setState({ loading: false }), 500);
     });
-    this.setState({ loading: false });
   }
 
-  getCookie = function(name) {
+  getCookie = function (name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     if (match) return match[2];
   }
@@ -95,21 +98,62 @@ class App extends React.Component {
   }
 
   logout = () => {
-    this.setState({ loading: true });
-    const token = this.getCookie("Token") ? this.getCookie("Token") : "";
-    fetch(`${Constant.host}/session?key=${token}`, {
-      method: "DELETE",
-      credentials: 'include'
-    }).then(() => {
-      this.setState({
-        loading: false,
-        username: undefined,
-        displayName: undefined,
-        token: undefined,
-        userLink: undefined,
-        avatarLink: undefined
+    this.setState({ loading: true }, () => {
+      const token = this.getCookie("Token") ? this.getCookie("Token") : "";
+      fetch(`${Constant.host}/session?key=${token}`, {
+        method: "DELETE",
+        credentials: 'include'
+      }).then(() => {
+        this.setState({
+          loading: false,
+          username: undefined,
+          displayName: undefined,
+          token: undefined,
+          userLink: undefined,
+          avatarLink: undefined
+        });
+      })
+    }
+    );
+  }
+
+  checkSignup = (username, displayName, password, passwordConfirm) => {
+    let ok = false;
+    if (password !== passwordConfirm) {
+      return { ok, err: "Passwords do not match!" };
+    }
+    const usernameRegex = /^[A-Za-z0-9_]{8,}$/;
+    if (!usernameRegex.test(username)) {
+      return { ok, err: "Username must only contain letters, numbers and underscore!" };
+    }
+    ok = true;
+    return { ok };
+  }
+
+  signup = (username, displayName, password, passwordConfirm) => {
+    const ok = this.checkSignup(username, displayName, password, passwordConfirm);
+    if (ok) {
+      let ok, err;
+      fetch(`${Constant.host}/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: username,
+          displayName: displayName,
+          password: password
+        })
+      }).then(res => {
+        ok = res.ok;
+        return res.json();
+      }).then(result => {
+        if (!ok) {
+          err = result.err;
+          alert(err);
+        }
       });
-    })
+    }
   }
 
   navigateToProfile = username => {
@@ -118,51 +162,48 @@ class App extends React.Component {
   navigateToProfileCallback = () => this.navigateToProfile(this.state.username);
 
   handleSearch = (token, query) => {
-    this.setState({ loading: true }, () => {
+    this.setState({}, () => {
       if (query === '') {
-        this.setState({loading: false, searchResult: []});
+        this.setState({ loading: false, searchResult: [] });
         return;
       }
       fetch(`${Constant.host}/users?q=${query}&key=${token}`)
         .then(res => res.json())
         .then(result => this.setState({ searchResult: result, loading: false }));
     });
-    
+
   }
   handleSearchCallback = () => this.handleSearch(this.state.token, this.state.query);
   createFollow = (token, username, followedUsername) => {
     if (!followedUsername) return;
     let ok;
-    this.setState({ loading: true }, () => {
-      fetch(`${Constant.host}/users/${username}/follows?f=${followedUsername}&key=${token}`, {
-        method: "POST"
-      }).then(res => {
-          ok = res.ok;
-          return res.json();
-        })
-        .then(json => {
-          if (ok) {
-            console.log(json);
-          } else {
 
-          }
-          this.handleSearchCallback();
-        })
+    fetch(`${Constant.host}/users/${username}/follows?f=${followedUsername}&key=${token}`, {
+      method: "POST"
+    }).then(res => {
+      ok = res.ok;
+      return res.json();
     })
+      .then(json => {
+        if (ok) {
+          console.log(json);
+        } else {
+
+        }
+        this.handleSearchCallback();
+      })
   };
   createFollowCallback = followedUsername => this.createFollow(this.state.token, this.state.username, followedUsername);
   deleteFollow = (token, username, followedUsername) => {
     if (!followedUsername) return;
     let ok;
-    this.setState({ loading: true }, () => {
-      fetch(`${Constant.host}/users/${username}/follows?f=${followedUsername}&key=${token}`, {
-        method: "DELETE"
-      }).then(res => {
-          ok = res.ok;
-          console.log(ok);
-          this.handleSearchCallback();
-        });
-    })
+    fetch(`${Constant.host}/users/${username}/follows?f=${followedUsername}&key=${token}`, {
+      method: "DELETE"
+    }).then(res => {
+      ok = res.ok;
+      console.log(ok);
+      this.handleSearchCallback();
+    });
   };
   deleteFollowCallback = followedUsername => this.deleteFollow(this.state.token, this.state.username, followedUsername);
 
@@ -173,43 +214,50 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <Route path="/">
-          {this.state.username && this.state.token && this.state.userLink ? 
-            <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
-              handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback}
-              query={this.state.query} onQueryChange={(e) => this.setState({ query: e.target.value }, this.handleSearchCallback)} 
-              onSearchFocus={() => this.setState({ isSearching: true })} 
-              onSearchExit={() => {
-                if (!this.state.searchResult || this.state.searchResult.length === 0)
-                this.setState({ isSearching: false });
-              }}
-              handleSearch={this.handleSearchCallback}
-              handleNavigateHome={() => this.setState({ isSearching: false })} />
-            : ""
-          }
-          {this.state.isSearching === true ? 
-            <SearchResult matchingUsers={this.state.searchResult} sessionUser={this.state.username}
-              handleFollow={this.createFollowCallback} handleUnfollow={this.deleteFollowCallback} />
-            : ""
-          }
-          {/* <SearchResultItem username="binhdh" displayName="Binh Do" avatarLink="./images/test.jpg" /> */}
-        </Route>
-        <Switch>
-          <Route exact path="/">
-            {this.state.loading === true || this.state.isSearching === true ? "" :
-            (this.state.username && this.state.token && this.state.userLink ?
-              <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-              : <LoginPage isSignup={false} handleLogin={this.login} />)
+        <div>
+          <Route path="/">
+            {this.state.username && this.state.token && this.state.userLink ?
+              <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
+                handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback}
+                query={this.state.query} onQueryChange={(e) => this.setState({ query: e.target.value }, this.handleSearchCallback)}
+                onSearchFocus={() => this.setState({ isSearching: true })}
+                onSearchExit={() => {
+                  if (!this.state.searchResult || this.state.searchResult.length === 0)
+                    this.setState({ isSearching: false });
+                }}
+                handleSearch={this.handleSearchCallback}
+                handleNavigateHome={() => this.setState({ isSearching: false })} />
+              : ""
             }
+            {this.state.loading ? <LoadingPage /> : ""}
+            {this.state.isSearching === true ?
+              <SearchResult matchingUsers={this.state.searchResult} sessionUser={this.state.username}
+                handleFollow={this.createFollowCallback} handleUnfollow={this.deleteFollowCallback} />
+              : ""
+            }
+            {/* <SearchResultItem username="binhdh" displayName="Binh Do" avatarLink="./images/test.jpg" /> */}
           </Route>
-          <Route path="/posts/:id" render={ ({match}) =>
-            this.state.username && this.state.token && this.state.userLink ?
-            <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-            : ""
-          }>
-          </Route>
-          <Route path="/:username" render={ ({match}) => {}}></Route>
-        </Switch>
+          <Switch>
+            <Route exact path="/">
+              {this.state.loading === true || this.state.isSearching === true ? "" :
+                (this.state.username && this.state.token && this.state.userLink ?
+                  <NewsFeed username={this.state.username} token={this.state.token}
+                    userLink={this.state.userLink} handleUnauthorization={this.checkLogin} />
+                  : <LoginPage isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
+              }
+            </Route>
+            <Route path="/posts/:id" render={({ match }) =>
+              this.state.username && this.state.token && this.state.userLink ?
+                <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+                : ""
+            }>
+            </Route>
+            <Route path="/:username" render={({ match }) => { }}></Route>
+          </Switch>
+        </div>
+        <Router path="/">
+          <Footer />
+        </Router>
       </Router>
 
       // <div>
@@ -301,17 +349,17 @@ class App extends React.Component {
       //   {/* <LoginPage />  */}
 
       //   {/* <Thumbnail 
-        
+
       //   /> */}
       // </div>
-        // <Gallery
-        //   post={{
-        //     username: "binh.dohai",
-        //     likeCount: 1,
-        //     commentCount: 2,
-        //     caption: "This is demo caption"
-        //   }}
-        // />
+      // <Gallery
+      //   post={{
+      //     username: "binh.dohai",
+      //     likeCount: 1,
+      //     commentCount: 2,
+      //     caption: "This is demo caption"
+      //   }}
+      // />
       // </div>
     );
   }

@@ -110,8 +110,9 @@ class App extends React.Component {
           displayName: undefined,
           token: undefined,
           userLink: undefined,
-          avatarLink: undefined
-        });
+          avatarLink: undefined,
+          query: ""
+        }, () => window.location.href = "/");
       })
     }
     );
@@ -162,16 +163,13 @@ class App extends React.Component {
   navigateToProfileCallback = () => this.navigateToProfile(this.state.username);
 
   handleSearch = (token, query) => {
-    this.setState({}, () => {
-      if (query === '') {
-        this.setState({ loading: false, searchResult: [] });
-        return;
-      }
-      fetch(`${Constant.host}/users?q=${query}&key=${token}`)
-        .then(res => res.json())
-        .then(result => this.setState({ searchResult: result, loading: false }));
-    });
-
+    if (query === '') {
+      this.setState({ loading: false, searchResult: [] });
+      return;
+    }
+    fetch(`${Constant.host}/users?q=${query}&key=${token}`)
+      .then(res => res.json())
+      .then(result => this.setState({ searchResult: result, loading: false }));
   }
   handleSearchCallback = () => this.handleSearch(this.state.token, this.state.query);
   createFollow = (token, username, followedUsername) => {
@@ -223,10 +221,10 @@ class App extends React.Component {
                 onSearchFocus={() => this.setState({ isSearching: true })}
                 onSearchExit={() => {
                   if (!this.state.searchResult || this.state.searchResult.length === 0)
-                    this.setState({ isSearching: false });
+                    this.setState({ isSearching: false, query: "" });
                 }}
                 handleSearch={this.handleSearchCallback}
-                handleNavigateHome={() => this.setState({ isSearching: false })} />
+                handleNavigateHome={() => this.setState({ isSearching: false, query: "" })} />
               : ""
             }
             {this.state.loading ? <LoadingPage /> : ""}

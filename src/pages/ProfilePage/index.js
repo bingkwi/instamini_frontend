@@ -11,16 +11,15 @@ class ProfilePage extends Component {
                         photo: "./images/test.jpg"
                     }}
 
-                    username={{
-                        username: "binh.dohai",
-                        displayName: "Quynh Bich"
-                    }}
+                    username="binh.dohai"
+                    displayName="Quynh Bich"
+                    // post= "1"
+                    followerCount="2"
+                    followingCount="2"
 
-                    counting={{
-                        post: 1,
-                        followerCount: 2,
-                        followingCount: 2
-                    }} />
+                    handleFollow={this.props.handleFollow}
+                    handleUnfollow={this.props.handleUnfollow}
+                />
                 <Gallery posts={this.props.posts} />
             </div>
         );

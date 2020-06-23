@@ -72,10 +72,10 @@ class Reaction extends Component {
         return (
             <>
                 <div className="mb-1" style={{ fontSize: "1.5rem" }}>
-                    <button type="button" class="btn btn-lg btn-primary bg-transparent text-dark border-0 p-0 mr-2" onClick={this.props.onLikeClicked}>
+                    <button type="button" className="btn btn-lg btn-primary bg-transparent text-dark border-0 p-0 mr-2" onClick={this.props.onLikeClicked}>
                         <i className={this.props.liked ? "fas fa-heart fa-lg text-danger" : "far fa-heart fa-lg"}></i>
                     </button>
-                    <button type="button" class="btn btn-lg btn-primary bg-transparent text-dark border-0 p-0" onClick={this.props.onCommentClicked}>
+                    <button type="button" className="btn btn-lg btn-primary bg-transparent text-dark border-0 p-0" onClick={this.props.onCommentClicked}>
                         <i className="far fa-comment fa-lg" aria-hidden="true"></i>
                     </button>
                 </div>

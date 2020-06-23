@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Constant from "../../utils/Constants";
 
 class Photo extends Component {
     render() {
@@ -28,7 +29,7 @@ class Counting extends Component {
     render() {
         return (
             <div>
-                <span>{this.props.post} posts</span>
+                {/* <span>{this.props.post} posts</span> */}
                 <span>{this.props.follower} followers</span>
                 <span>{this.props.following} followings</span>
             </div>
@@ -37,22 +38,28 @@ class Counting extends Component {
 }
 
 class FollowButton extends Component {
+
     constructor(props) {
         super(props);
-
-        this.state = {
-            onClick : false
-        }
-
-        this.handleFollow = () => this.setState({ onClick: true })
-        this.handleUnFollow = () => this.setState({ onClick: false })
-
     }
+
+    handleFollow = () => {
+        if (this.props.followed) {
+            this.props.handleUnfollow(this.props.username);
+        } else {
+            this.props.handleFollow(this.props.username);
+        }
+    };
+
     render() {
         return (
             <div>
-                <button type="button" className="btn btn-success">Follow</button>
-                <button type="button" className="btn btn-secondary">Unfollow</button>
+                {
+                    this.props.isSelf ? "" :
+                        (this.props.followed ? 
+                        <button className="btn btn-secondary" onClick={this.handleFollow}>Unfollow</button>
+                        : <button className="btn btn-primary" onClick={this.handleFollow}>Follow</button>)
+                }
             </div>
         );
     }
@@ -66,21 +73,23 @@ class Profile extends Component {
                     <Photo photo={this.props.photo.photo} />
                     <div className="mr-5">
                         <Username
-                            username={this.props.username.username}
-                            displayName={this.props.username.displayName} />
+                            username={this.props.username}
+                            displayName={this.props.displayName} />
                         <div className="mx-5 d-flex py-2">
                             <Counting
-                                post={this.props.counting.post}
-                                follower={this.props.counting.followerCount}
-                                following={this.props.counting.followingCount}
+                                // post={this.props.counting.post}
+                                follower={this.props.followerCount}
+                                following={this.props.followingCount}
                             />
 
                         </div>
                     </div>
-                    <div className="mt-2"
-                        follow={this.handleFollow}
-                        unFollow={this.handleUnFollow}>
-                        <FollowButton />
+                    <div className="mt-2">
+                        <FollowButton
+                            username={this.props.username}
+                            handleFollow={this.props.handleFollow}
+                            handleUnfollow={this.props.handleUnfollow}
+                        />
                     </div>
                 </div>
             </div>

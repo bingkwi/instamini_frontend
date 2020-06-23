@@ -12,6 +12,8 @@ import Thumbnail from './components/Thumbnail';
 import FullPost from './pages/FullPost';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Gallery from './components/Thumbnail';
+import SearchResultItem from './components/SearchResultItem';
+import SearchResult from './pages/SearchResult';
 
 class App extends React.Component {
 
@@ -23,7 +25,9 @@ class App extends React.Component {
       token: undefined,
       userLink: undefined,
       avatarLink: undefined,
-      loading: true
+      loading: true,
+      isSearching: false,
+      query: undefined
     };
   }
 
@@ -113,6 +117,55 @@ class App extends React.Component {
   }
   navigateToProfileCallback = () => this.navigateToProfile(this.state.username);
 
+  handleSearch = (token, query) => {
+    this.setState({ loading: true }, () => {
+      if (query === '') {
+        this.setState({loading: false, searchResult: []});
+        return;
+      }
+      fetch(`${Constant.host}/users?q=${query}&key=${token}`)
+        .then(res => res.json())
+        .then(result => this.setState({ searchResult: result, loading: false }));
+    });
+    
+  }
+  handleSearchCallback = () => this.handleSearch(this.state.token, this.state.query);
+  createFollow = (token, username, followedUsername) => {
+    if (!followedUsername) return;
+    let ok;
+    this.setState({ loading: true }, () => {
+      fetch(`${Constant.host}/users/${username}/follows?f=${followedUsername}&key=${token}`, {
+        method: "POST"
+      }).then(res => {
+          ok = res.ok;
+          return res.json();
+        })
+        .then(json => {
+          if (ok) {
+            console.log(json);
+          } else {
+
+          }
+          this.handleSearchCallback();
+        })
+    })
+  };
+  createFollowCallback = followedUsername => this.createFollow(this.state.token, this.state.username, followedUsername);
+  deleteFollow = (token, username, followedUsername) => {
+    if (!followedUsername) return;
+    let ok;
+    this.setState({ loading: true }, () => {
+      fetch(`${Constant.host}/users/${username}/follows?f=${followedUsername}&key=${token}`, {
+        method: "DELETE"
+      }).then(res => {
+          ok = res.ok;
+          console.log(ok);
+          this.handleSearchCallback();
+        });
+    })
+  };
+  deleteFollowCallback = followedUsername => this.deleteFollow(this.state.token, this.state.username, followedUsername);
+
   componentDidMount() {
     this.checkLogin();
   }
@@ -123,13 +176,27 @@ class App extends React.Component {
         <Route path="/">
           {this.state.username && this.state.token && this.state.userLink ? 
             <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
-              handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback} />
+              handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback}
+              query={this.state.query} onQueryChange={(e) => this.setState({ query: e.target.value }, this.handleSearchCallback)} 
+              onSearchFocus={() => this.setState({ isSearching: true })} 
+              onSearchExit={() => {
+                if (!this.state.searchResult || this.state.searchResult.length === 0)
+                this.setState({ isSearching: false });
+              }}
+              handleSearch={this.handleSearchCallback}
+              handleNavigateHome={() => this.setState({ isSearching: false })} />
             : ""
           }
+          {this.state.isSearching === true ? 
+            <SearchResult matchingUsers={this.state.searchResult} sessionUser={this.state.username}
+              handleFollow={this.createFollowCallback} handleUnfollow={this.deleteFollowCallback} />
+            : ""
+          }
+          {/* <SearchResultItem username="binhdh" displayName="Binh Do" avatarLink="./images/test.jpg" /> */}
         </Route>
         <Switch>
           <Route exact path="/">
-            {this.state.loading === true ? "" :
+            {this.state.loading === true || this.state.isSearching === true ? "" :
             (this.state.username && this.state.token && this.state.userLink ?
               <NewsFeed username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
               : <LoginPage isSignup={false} handleLogin={this.login} />)

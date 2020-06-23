@@ -9,11 +9,13 @@ class NavigationBar extends Component {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mr-auto d-flex justify-content-between w-100">
                             <li className="nav-item active">
-                                <a className="nav-link" href="/">Instamini<span className="sr-only">(current)</span></a>
+                                <button className="nav-link btn" onClick={this.props.handleNavigateHome}>Instamini<span className="sr-only">(current)</span></button>
                             </li>
                             <li>
                                 <form className="form-inline my-2 my-lg-0">
-                                    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
+                                    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" 
+                                        value={this.props.query} onChange={this.props.onQueryChange}
+                                        onFocus={this.props.onSearchFocus} onBlur={this.props.onSearchExit} />
                                     <button className="btn btn-outline-success my-2 my-sm-0" type="submit"><i className="fa fa-search" aria-hidden="true"></i></button>
                                 </form>
                             </li>

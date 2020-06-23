@@ -36,13 +36,35 @@ class Counting extends Component {
     }
 }
 
+class FollowButton extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            onClick : false
+        }
+
+        this.handleFollow = () => this.setState({ onClick: true })
+        this.handleUnFollow = () => this.setState({ onClick: false })
+
+    }
+    render() {
+        return (
+            <div>
+                <button type="button" className="btn btn-success">Follow</button>
+                <button type="button" className="btn btn-secondary">Unfollow</button>
+            </div>
+        );
+    }
+}
+
 class Profile extends Component {
     render() {
         return (
-            <div className="card container w-50 p-4 mt-3">
-                <div className="d-flex" >
+            <div className="card container w-75 p-4 mt-3">
+                <div className="d-flex ml-3" >
                     <Photo photo={this.props.photo.photo} />
-                    <div>
+                    <div className="mr-5">
                         <Username
                             username={this.props.username.username}
                             displayName={this.props.username.displayName} />
@@ -54,6 +76,11 @@ class Profile extends Component {
                             />
 
                         </div>
+                    </div>
+                    <div className="mt-2"
+                        follow={this.handleFollow}
+                        unFollow={this.handleUnFollow}>
+                        <FollowButton />
                     </div>
                 </div>
             </div>

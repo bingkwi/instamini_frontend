@@ -156,7 +156,7 @@ class App extends React.Component {
             <FullPost id="1" username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
             : ""
         }
-        <section class="container-proflie">
+        {/* <section class="container-proflie">
           <Profile
             photo={{
               photo: "./images/test.jpg"
@@ -174,7 +174,7 @@ class App extends React.Component {
             }}
 
           />
-        </section>
+        </section> */}
 
         {/* <section class="container">
           <Box />

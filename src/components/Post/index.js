@@ -61,7 +61,7 @@ class PhotoList extends Component {
             );
         else {
             return (<div onDoubleClick={this.props.onLike} className={`${this.props.isHorizontal ? "col-sm-7" : ""} p-0`}>
-                {this.props.photos.map(photo => <img src={`${Constant.host}${photo.link}`} className="card-img-top" alt="redundant-alt" />)}
+                {this.props.photos.map((photo, index) => <img src={`${Constant.host}${photo.link}`} className="card-img-top" alt="redundant-alt" key={index} />)}
             </div>)
         }
     }

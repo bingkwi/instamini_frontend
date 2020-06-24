@@ -219,7 +219,13 @@ class App extends React.Component {
                     this.setState({ isSearching: false, query: "" });
                 }}
                 handleSearch={this.handleSearchCallback}
-                handleNavigateHome={() => this.setState({ isSearching: false, query: "" })} />
+                handleNavigateHome={() => {
+                  this.setState({ isSearching: false, query: "" });
+                  if (window.location.pathname !== "/") {
+                    window.location.href = "/";
+                  }
+                } 
+                }/>
               : ""
             }
             {this.state.loading ? <LoadingPage /> : ""}
@@ -239,15 +245,16 @@ class App extends React.Component {
                   : <LoginPage isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
               }
             </Route>
-            <Route path="/posts/:id" render={({ match }) =>
+            <Route exact path="/posts/:id" render={({ match }) =>
               this.state.username && this.state.token && this.state.userLink ?
                 <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
                 : ""
             }>
             </Route>
-            <Route path="/:username" render={() =>
-              this.state.username && this.state.token && this.state.userLink ?
-                <ProfilePage username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+            <Route exact path="/:username" render={({ match }) =>
+              this.state.token ?
+                <ProfilePage username={match.params.username} token={this.state.token} 
+                  canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} />
                 : ""
             }>
             </Route>

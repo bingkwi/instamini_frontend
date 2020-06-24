@@ -72,33 +72,38 @@ class App extends React.Component {
   }
 
   checkLogin = () => {
-    this.setState({ loading: true });
-    let ok;
-    let token = this.getCookie("Token");
-    token = token ? token : "";
-    fetch(`${Constant.host}/session?key=${token}`, {
-      credentials: 'include'
-    }).then(res => {
-      if (ok = res.ok) {
-        return res.json();
+    this.setState({ loading: true }, () => {
+      let ok;
+      let token = this.getCookie("Token");
+      if (!token) {
+        this.setState({ loading: false });
+        return;
       }
-      return Promise.resolve({
-        tokenResponse: {}
-      })
-    }).then(tokenResponse => {
-      if (!ok && token === "" && this.state.username) {
-        window.showMessageModal("danger", "Session timed out", "Your session has timed out, please login again!");
-      }
-      this.setState({
-        username: tokenResponse.username,
-        displayName: tokenResponse.displayName,
-        token: tokenResponse.token,
-        userLink: tokenResponse.link,
-        avatarLink: tokenResponse.avatarLink,
-        loading: false
+      token = token ? token : "";
+      fetch(`${Constant.host}/session?key=${token}`, {
+        credentials: 'include'
+      }).then(res => {
+        if (ok = res.ok) {
+          return res.json();
+        }
+        return Promise.resolve({
+          tokenResponse: {}
+        })
+      }).then(tokenResponse => {
+        if (!ok && token === "" && this.state.username) {
+          window.showMessageModal("danger", "Session timed out", "Your session has timed out, please login again!");
+        }
+        this.setState({
+          username: tokenResponse.username,
+          displayName: tokenResponse.displayName,
+          token: tokenResponse.token,
+          userLink: tokenResponse.link,
+          avatarLink: tokenResponse.avatarLink,
+          loading: false
+        });
       });
+      // this.setState({ loading: false });
     });
-    // this.setState({ loading: false });
   }
 
   logout = () => {
@@ -238,8 +243,8 @@ class App extends React.Component {
                   if (window.location.pathname !== "/") {
                     window.location.href = "/";
                   }
-                } 
-                }/>
+                }
+                } />
               : ""
             }
             {this.state.loading ? <LoadingPage /> : ""}
@@ -266,10 +271,10 @@ class App extends React.Component {
             }>
             </Route>
             <Route exact path="/:username" render={({ match }) =>
-              this.state.token ?
-                <ProfilePage username={match.params.username} token={this.state.token} 
+              !this.state.isSearching && (this.state.token || this.getCookie("Token")) ?
+                <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.getCookie("Token")}
                   canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} />
-                : ""
+                : window.location.href = "/"
             }>
             </Route>
           </Switch>

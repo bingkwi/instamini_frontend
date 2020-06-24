@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-env jquery */
 function showLoadingModal() {
     const modal = document.createElement('div');
     modal.innerHTML = `
@@ -69,4 +71,21 @@ function showMessageModal(bootstrapClass, title, message, modalToRemove='addLoca
     if (dismissCallback !== null) {
         $('#status_modal').on('hide.bs.modal', dismissCallback);
     }
+}
+
+function closeModal(modalId) {
+    $(`#${modalId}`).modal('hide');
+}
+
+function openModal(modalId) {
+    $(`#${modalId}`).modal('show');
+}
+
+/**
+ * 
+ * @param {Element} modal 
+ * @param {Function} callback 
+ */
+function addCloseEventToModal(modal, callback) {
+    $(`#${modal.id}`).on('hidden.bs.modal', callback);
 }

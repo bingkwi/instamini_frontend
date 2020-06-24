@@ -19,27 +19,29 @@ class Thumbnail extends Component {
 
     render() {
         return (
-            <div className="col-md-4 col-sm-6 pb-5" >
-                <div className="card thumbnail" style={{ width: "300px", height: "300px", cursor: "pointer", background: `url(${Constant.host}${this.props.thumbnail})`, backgroundSize: "cover", backgroundPosition: "center" }}
-                    onMouseEnter={this.handleMouseOver}
-                    onMouseLeave={this.handleMouseLeave} 
-                    onClick={() => window.location.href = `/posts/${this.props.id}` }>
-                    {this.state.hovered ?
-                        <div className="reaction d-flex justify-content-center" style={{ fontSize: "1.5rem" }}>
-                            <div>
-                            <i class="fas fa-heart fa-sm"></i>
-                            <span className="mx-3">{this.props.likeCount}</span>
-                            </div>
-                            <div>
-                            <i class="fas fa-comment fa-sm" aria-hidden="true"></i>
-                            <span className="mx-3">{this.props.commentCount}</span>
-                            </div>
-                        </div>
-                        : ""
-                    }
-                </div>
-            </div>
+            <>
 
+                <div className="col-md-4 col-sm-6 pb-5" >
+                    <div className="card thumbnail" style={{ width: "300px", height: "300px", cursor: "pointer", background: `url(${Constant.host}${this.props.thumbnail})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                        onMouseEnter={this.handleMouseOver}
+                        onMouseLeave={this.handleMouseLeave}
+                        onClick={() => window.location.href = `/posts/${this.props.id}`}>
+                        {this.state.hovered ?
+                            <div className="reaction d-flex justify-content-center" style={{ fontSize: "1.5rem" }}>
+                                <div>
+                                    <i class="fas fa-heart fa-sm"></i>
+                                    <span className="mx-3">{this.props.likeCount}</span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-comment fa-sm" aria-hidden="true"></i>
+                                    <span className="mx-3">{this.props.commentCount}</span>
+                                </div>
+                            </div>
+                            : ""
+                        }
+                    </div>
+                </div>
+            </>
         );
     }
 }
@@ -47,8 +49,10 @@ class Thumbnail extends Component {
 class Gallery extends Component {
     render() {
         return (
-            <div className="container">
-                <div className="row d-flex mt-5">
+            <div className="container mt-5">
+                <h4>Uploaded photos</h4>
+                <hr />
+                <div className="row d-flex">
                     {this.props.posts.map(post => <Thumbnail {...post} />)}
                 </div>
             </div>

@@ -373,6 +373,7 @@ class Post extends Component {
                         <User 
                             username={this.props.username} userAvatar={this.props.userAvatar} canEdit={this.props.canEdit} 
                             handleEdit={() => this.setState({ isEditing: !this.state.isEditing })}
+                            handleDelete={this.deletePostCallback}
                             isHorizontal={this.props.isHorizontal} />
                         <div className="card-body px-3 py-2">
                             <Reaction likeCount={this.props.likeCount}

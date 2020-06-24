@@ -5,7 +5,7 @@ class Photo extends Component {
     render() {
         return (
             <div>
-                <img src={this.props.photo} className="img-fluid rounded-circle mr-4" style={{ objectFit: "cover", width: "150px", height: "150px" }} alt="" />
+                <img src={`${Constant.host }${this.props.avatarLink}`} className="img-fluid rounded-circle mr-4" style={{ objectFit: "cover", width: "150px", height: "150px" }} alt="" />
             </div>
         );
     }
@@ -29,7 +29,7 @@ class Counting extends Component {
     render() {
         return (
             <div>
-                {/* <span>{this.props.post} posts</span> */}
+                <span>{this.props.postCount} posts</span>
                 <span>{this.props.follower} followers</span>
                 <span>{this.props.following} followings</span>
             </div>
@@ -38,10 +38,6 @@ class Counting extends Component {
 }
 
 class FollowButton extends Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     handleFollow = () => {
         if (this.props.followed) {
@@ -55,10 +51,11 @@ class FollowButton extends Component {
         return (
             <div>
                 {
-                    this.props.isSelf ? "" :
+                    this.props.canFollow ?
                         (this.props.followed ? 
                         <button className="btn btn-secondary" onClick={this.handleFollow}>Unfollow</button>
                         : <button className="btn btn-primary" onClick={this.handleFollow}>Follow</button>)
+                        : ""
                 }
             </div>
         );
@@ -70,14 +67,14 @@ class Profile extends Component {
         return (
             <div className="card container w-75 p-4 mt-3">
                 <div className="d-flex ml-3" >
-                    <Photo photo={this.props.photo.photo} />
+                    <Photo avatarLink={this.props.avatarLink} />
                     <div className="mr-5">
                         <Username
                             username={this.props.username}
                             displayName={this.props.displayName} />
                         <div className="mx-5 d-flex py-2">
                             <Counting
-                                // post={this.props.counting.post}
+                                postCount={this.props.posts.length}
                                 follower={this.props.followerCount}
                                 following={this.props.followingCount}
                             />
@@ -86,6 +83,8 @@ class Profile extends Component {
                     </div>
                     <div className="mt-2">
                         <FollowButton
+                            canFollow={this.props.canFollow}
+                            followed={this.props.followed}
                             username={this.props.username}
                             handleFollow={this.props.handleFollow}
                             handleUnfollow={this.props.handleUnfollow}

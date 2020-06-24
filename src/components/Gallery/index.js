@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Post from '../Post';
+import Constant from "../../utils/Constants";
 
 class Thumbnail extends Component {
 
@@ -20,10 +20,10 @@ class Thumbnail extends Component {
     render() {
         return (
             <div className="col-md-4 col-sm-6 pb-5" >
-                <div className="card thumbnail" style={{ width: "300px", height: "300px", cursor: "pointer", background: `url(${this.props.link})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                <div className="card thumbnail" style={{ width: "300px", height: "300px", cursor: "pointer", background: `url(${Constant.host}${this.props.thumbnail})`, backgroundSize: "cover", backgroundPosition: "center" }}
                     onMouseEnter={this.handleMouseOver}
-                    onMouseLeave={this.handleMouseLeave} >
-                    {/* <img src="./images/test.jpg" className="w-100 h-100" style={{ objectFit: "cover" }} alt="" /> */}
+                    onMouseLeave={this.handleMouseLeave} 
+                    onClick={() => window.location.href = `/posts/${this.props.id}` }>
                     {this.state.hovered ?
                         <div className="reaction d-flex justify-content-center" style={{ fontSize: "1.5rem" }}>
                             <div>

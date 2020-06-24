@@ -30,6 +30,7 @@ class App extends React.Component {
 
   login = (username, password) => {
     this.setState({ loading: true }, () => {
+      let statusCode, ok;
       fetch(`${Constant.host}/session`, {
         method: "POST",
         headers: {
@@ -41,13 +42,18 @@ class App extends React.Component {
         }),
         credentials: 'include'
       }).then(res => {
-        if (res.ok) {
+        statusCode = res.status;
+        if (ok = res.ok) {
           return res.json();
         }
         return Promise.resolve({
           tokenResponse: {}
         })
       }).then(tokenResponse => {
+        if (!ok) {
+          window.showMessageModal('danger', 'Login failed', 'Login failed, please check username and password!');
+          return;
+        }
         this.setState({
           username: tokenResponse.username,
           displayName: tokenResponse.displayName,
@@ -67,19 +73,22 @@ class App extends React.Component {
 
   checkLogin = () => {
     this.setState({ loading: true });
+    let ok;
     let token = this.getCookie("Token");
     token = token ? token : "";
     fetch(`${Constant.host}/session?key=${token}`, {
       credentials: 'include'
     }).then(res => {
-      if (res.ok) {
+      if (ok = res.ok) {
         return res.json();
       }
       return Promise.resolve({
         tokenResponse: {}
       })
     }).then(tokenResponse => {
-      console.log(tokenResponse)
+      if (!ok && token === "" && this.state.username) {
+        window.showMessageModal("danger", "Session timed out", "Your session has timed out, please login again!");
+      }
       this.setState({
         username: tokenResponse.username,
         displayName: tokenResponse.displayName,
@@ -118,7 +127,7 @@ class App extends React.Component {
     if (password !== passwordConfirm) {
       return { ok, err: "Passwords do not match!" };
     }
-    const usernameRegex = /^[A-Za-z0-9_]{8,}$/;
+    const usernameRegex = /^[A-Za-z0-9_]{6,}$/;
     if (!usernameRegex.test(username)) {
       return { ok, err: "Username must only contain letters, numbers and underscore!" };
     }
@@ -128,6 +137,11 @@ class App extends React.Component {
 
   signup = (username, displayName, password, passwordConfirm) => {
     const ok = this.checkSignup(username, displayName, password, passwordConfirm);
+    let err;
+    if (err = ok.err) {
+      window.showMessageModal("danger", "Error", err);
+      return;
+    }
     if (ok) {
       let ok, err;
       fetch(`${Constant.host}/users`, {
@@ -146,7 +160,7 @@ class App extends React.Component {
       }).then(result => {
         if (!ok) {
           err = result.err;
-          alert(err);
+          window.showMessageModal("danger", "Error", err);
         }
       });
     }

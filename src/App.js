@@ -22,6 +22,7 @@ class App extends React.Component {
       token: undefined,
       userLink: undefined,
       avatarLink: undefined,
+      followings: [],
       loading: true,
       isSearching: false,
       query: ''
@@ -59,10 +60,12 @@ class App extends React.Component {
           displayName: tokenResponse.displayName,
           token: tokenResponse.token,
           avatarLink: tokenResponse.avatarLink,
-          userLink: tokenResponse.link
+          followings: tokenResponse.followings,
+          userLink: tokenResponse.link,
+          loading: false
         });
       });
-      window.setTimeout(() => this.setState({ loading: false }), 500);
+      // window.setTimeout(() => this.setState({ loading: false }), 500);
     });
   }
 
@@ -99,6 +102,7 @@ class App extends React.Component {
           token: tokenResponse.token,
           userLink: tokenResponse.link,
           avatarLink: tokenResponse.avatarLink,
+          followings: tokenResponse.followings,
           loading: false
         });
       });
@@ -120,6 +124,7 @@ class App extends React.Component {
           token: undefined,
           userLink: undefined,
           avatarLink: undefined,
+          followings: [],
           query: ""
         }, () => window.location.href = "/");
       })
@@ -273,7 +278,7 @@ class App extends React.Component {
             <Route exact path="/:username" render={({ match }) =>
               !this.state.isSearching && (this.state.token || this.getCookie("Token")) ?
                 <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.getCookie("Token")}
-                  canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} />
+                  canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} currentFollowings={this.state.followings} />
                 : window.location.href = "/"
             }>
             </Route>

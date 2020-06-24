@@ -51,6 +51,8 @@ class ProfilePage extends Component {
                             {...this.state}
                             token={this.props.token}
                             canFollow={this.props.canFollow}
+                            currentFollowings={this.props.currentFollowings}
+                            sessionUser={this.props.sessionUser}
                             followed={this.state.followers.some(u => u.username === this.props.sessionUser)}
                             handleFollow={() => this.createFollow(this.props.token, this.props.sessionUser, this.props.username)}
                             handleUnfollow={() => this.deleteFollow(this.props.token, this.props.sessionUser, this.props.username)}

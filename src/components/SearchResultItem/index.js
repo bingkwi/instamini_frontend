@@ -11,7 +11,7 @@ class SearchResultItem extends Component {
 
     render() {
         return (
-            <div className="d-flex align-items-center w-50 py-1 my-1 container">
+            <div className={`d-flex align-items-center ${this.props.fullWidth ? "w-100 px-0" : "w-50"} py-1 my-1 container`}>
                 <div className="w-100 d-flex align-items-center">
                     <a href={`/${this.props.username}`}>
                         <img src={`${Constant.host}${this.props.avatarLink}`} alt="none" className="rounded-circle" width="60px" height="60px" style={{ objectFit: "cover" }} />

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Constant from "../../utils/Constants";
 import ImageUpload from '../ImageUpload';
+import FollowList from '../FollowList';
 
 class Photo extends Component {
     render() {
@@ -41,40 +42,34 @@ class Counting extends Component {
         return (
             <div className="w-75 d-flex justify-content-between">
                 <button className="btn p-0">{this.props.postCount} posts</button>
-                <button className="btn p-0" data-toggle="modal" data-target="#followers">{this.props.follower} followers</button>
-                <div class="modal fade" id="followers" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Followers</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                <button className="btn p-0" data-toggle="modal" data-target="#followers">{this.props.followerCount} followers</button>
+                <div className="modal fade" id="followers" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Followers</h5>
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" className="m-0">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                Body
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <div className="modal-body">
+                                <FollowList follows={this.props.followers} currentFollowings={this.props.currentFollowings} sessionUser={this.props.sessionUser} />
                             </div>
                         </div>
                     </div>
                 </div>
-                <button className="btn p-0" data-toggle="modal" data-target="#followings">{this.props.following} followings</button>
-                <div class="modal fade" id="followings" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Followings</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                <button className="btn p-0" data-toggle="modal" data-target="#followings">{this.props.followingCount} followings</button>
+                <div className="modal fade" id="followings" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Followings</h5>
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" className="m-0">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                Body
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <div className="modal-body">
+                                <FollowList follows={this.props.followings} currentFollowings={this.props.currentFollowings} sessionUser={this.props.sessionUser} />
                             </div>
                         </div>
                     </div>
@@ -193,8 +188,12 @@ class Profile extends Component {
                         <div className="d-flex py-2">
                             <Counting
                                 postCount={this.props.posts.length}
-                                follower={this.props.followerCount}
-                                following={this.props.followingCount}
+                                followerCount={this.props.followerCount}
+                                followers={this.props.followers}
+                                followingCount={this.props.followingCount}
+                                followings={this.props.followings}
+                                currentFollowings={this.props.currentFollowings}
+                                sessionUser={this.props.sessionUser}
                             />
                         </div>
 

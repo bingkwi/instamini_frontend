@@ -43,7 +43,9 @@ class FullPost extends Component {
                 } else {
                     postList = [post];
                 }
-                this.setState({ posts: postList, loading: false });
+                this.setState({ posts: postList, loading: false }, () => {
+                    document.title = `@${post.username} on Instamini: "${post.caption.substring(0, 100)}${post.caption.length > 100 ? "..." : ""}"`;
+                });
             });
     }
 

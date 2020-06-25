@@ -12,7 +12,7 @@ class ProfilePage extends Component {
                 ok = res.ok;
                 return res.json();
             }).then(result => {
-                this.setState({ ...result });
+                this.setState({ ...result }, () => document.title = `${result.displayName} (@${result.username}) | Instamini Photo Sharing`);
             });
     }
 

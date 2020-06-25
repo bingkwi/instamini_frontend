@@ -94,9 +94,17 @@ class EditProfile extends Component {
     }
     handleEdit = (token, username, displayName, password, newPassword, newPasswordConfirm) => {
         // check props.username and password
-        fetch(`${Constant.host}/session?key=${token}`, {
+        fetch(`${Constant.host}/session`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              username: this.props.username,
+              password: password
+            }),
             credentials: 'include'
-        }).then(res => {
+          }).then(res => {
             const ok = res.ok;
             if (!ok) return;
 
@@ -129,15 +137,14 @@ class EditProfile extends Component {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
-                        username: username,
-                        displayName: displayName,
-                        password: password,
-                        newPassword: newPassword,
-                        newPasswordConfirm: newPasswordConfirm
-                    })
+                    body: JSON.stringify(body)
                 }).then(() => {
-                    this.props.refresh();
+                    if(!username){
+                        window.location.reload();
+                    }else{
+                        window.location.href = `/${username}`;
+                    }
+                    
                 });
         });
 
@@ -159,7 +166,7 @@ class EditProfile extends Component {
                 window.location.href = "/";
             });
     }
-    handleEditCallback = () => this.handleEdit(this.props.token)
+    handleEditCallback = () => this.handleEdit(this.props.token, this.state.username, this.state.displayName, this.state.password, this.state.newPassword, this.state.newPasswordConfirm)
     handleDeleteCallback = () => this.handleDelete(this.props.token, this.props.username);
 
     render() {
@@ -172,7 +179,7 @@ class EditProfile extends Component {
                         </button>
                         <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
 
-                            <button className="dropdown-item row m-0 pl-2" onClick={this.handleEditCallback} data-target="#profileModal" data-toggle="modal">
+                            <button className="dropdown-item row m-0 pl-2" data-target="#profileModal" data-toggle="modal">
                                 <i className="fas fa-edit fa-sm col-sm-4"></i>
                                     Edit
                             </button>
@@ -218,8 +225,8 @@ class EditProfile extends Component {
                                 }
                             </div>
                             <div className="modal-footer d-flex">
-                                <button className="btn btn-success">OK</button>
-                                <button className="btn btn-secondary" data-dismiss="modal" data-target="#modalId">Cancel</button>
+                                <button className="btn btn-success" onClick={this.handleEditCallback}>OK</button>
+                                <button className="btn btn-secondary" data-dismiss="modal" data-target="#profileModal">Cancel</button>
                             </div>
                         </div>
                     </div>

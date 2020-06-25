@@ -329,7 +329,13 @@ class Post extends Component {
                 headers: {
                     "Content-Type": "application/json"
                 }
-            }).then(this.props.updatePosts);
+            }).then(() => {
+                if (this.props.isHorizontal) {
+                    window.location.href = "/";
+                } else {
+                    this.props.updatePosts();
+                }
+            });
     }
 
     deleteComment = (commentId, token) => {

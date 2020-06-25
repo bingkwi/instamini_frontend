@@ -47,6 +47,7 @@ class NewsFeed extends Component {
 
     handleSubmit = (token, username, caption, files) => {
         if (caption === "" || !files) return false;
+        window.showLoadingModal();
         let formData = new FormData();
         formData.append("caption", caption);
         for (const file of files) {
@@ -56,7 +57,10 @@ class NewsFeed extends Component {
         fetch(`${Constant.host}/users/${username}/posts?key=${token}`, {
             method: "POST",
             body: formData
-        }).then(res => res.json()).then(this.updatePosts);
+        }).then(res => res.json()).then(() => {
+            window.removeLoadingModal();
+            this.updatePosts();
+        });
     }
 
     render() {

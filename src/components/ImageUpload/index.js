@@ -37,12 +37,14 @@ class ImageUpload extends React.Component {
         if (!username || !token || !file) {
             return;
         }
+        window.showLoadingModal();
         let formData = new FormData();
         formData.append("newAvatar", this.state.file);
         fetch(`${Constant.host}/users/${username}/avatar?key=${token}`, {
             method: "PATCH",
             body: formData
         }).then(res => {
+            window.removeLoadingModal();
             if (res.ok) {
                 window.showMessageModal("success", "Success", "Avatar was successfully updated!", "avatarModal", this.props.refresh);
             } else {

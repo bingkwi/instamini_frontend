@@ -3,7 +3,6 @@ import './App.css';
 import NavigationBar from './components/NavigationBar';
 import Constant from './utils/Constants';
 import NewsFeed from './pages/NewsFeed';
-// import Constants from './utils/Constants'
 import LoginPage from './pages/LoginPage';
 import FullPost from './pages/FullPost';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -11,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import SearchResult from './pages/SearchResult';
 import LoadingPage from './pages/LoadingPage';
 import Footer from './components/Footer';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 class App extends React.Component {
 
@@ -232,7 +232,7 @@ class App extends React.Component {
     return (
       <Router>
         <div>
-          <Route path="/">
+          <Route path="*">
             {this.state.username && this.state.token && this.state.userLink ?
               <NavigationBar displayName={this.state.username} avatarLink={`${Constant.host}${this.state.avatarLink}`}
                 handleLogout={this.logout} handleNavigateToProfile={this.navigateToProfileCallback}
@@ -260,29 +260,37 @@ class App extends React.Component {
             }
             {/* <SearchResultItem username="binhdh" displayName="Binh Do" avatarLink="./images/test.jpg" /> */}
           </Route>
-          <Switch>
-            <Route exact path="/">
-              {this.state.loading === true || this.state.isSearching === true ? "" :
-                (this.state.username && this.state.token && this.state.userLink ?
-                  <NewsFeed username={this.state.username} token={this.state.token}
-                    userLink={this.state.userLink} handleUnauthorization={this.checkLogin} />
-                  : <LoginPage isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
-              }
-            </Route>
-            <Route exact path="/posts/:id" render={({ match }) =>
-              this.state.username && this.state.token && this.state.userLink ?
-                <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-                : ""
-            }>
-            </Route>
-            <Route exact path="/:username" render={({ match }) =>
-              !this.state.isSearching && (this.state.token || this.getCookie("Token")) ?
-                <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.getCookie("Token")}
-                  canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} currentFollowings={this.state.followings} />
-                : window.location.href = "/"
-            }>
-            </Route>
-          </Switch>
+          <TransitionGroup>
+            <CSSTransition
+              // key={location.key}
+              classNames="fade"
+              timeout={300}
+            >
+              <Switch>
+                <Route exact path="/">
+                  {this.state.loading === true || this.state.isSearching === true ? "" :
+                    (this.state.username && this.state.token && this.state.userLink ?
+                      <NewsFeed username={this.state.username} token={this.state.token}
+                        userLink={this.state.userLink} handleUnauthorization={this.checkLogin} />
+                      : <LoginPage isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
+                  }
+                </Route>
+                <Route exact path="/posts/:id" render={({ match }) =>
+                  this.state.username && this.state.token && this.state.userLink ?
+                    <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
+                    : ""
+                }>
+                </Route>
+                <Route exact path="/:username" render={({ match }) =>
+                  this.state.isSearching === true ? "" : (this.state.token || this.getCookie("Token")) ?
+                    <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.getCookie("Token")}
+                      canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} currentFollowings={this.state.followings} />
+                    : window.location.href = "/"
+                }>
+                </Route>
+              </Switch>
+            </CSSTransition>
+          </TransitionGroup>
         </div>
         <Router path="/">
           <Footer />

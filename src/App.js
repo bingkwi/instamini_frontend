@@ -27,6 +27,7 @@ class App extends React.Component {
       isSearching: false,
       query: ''
     };
+    this.loginRef = undefined;
   }
 
   login = (username, password) => {
@@ -146,14 +147,14 @@ class App extends React.Component {
   }
 
   signup = (username, displayName, password, passwordConfirm) => {
-    const ok = this.checkSignup(username, displayName, password, passwordConfirm);
-    let err;
-    if (err = ok.err) {
+    let signupOk = this.checkSignup(username, displayName, password, passwordConfirm);
+    const err = signupOk.err;
+    if (err) {
       window.showMessageModal("danger", "Error", err);
       return;
     }
-    if (ok) {
-      let ok, err;
+    window.showLoadingModal();
+    if (signupOk) {
       fetch(`${Constant.host}/users`, {
         method: "POST",
         headers: {
@@ -165,12 +166,13 @@ class App extends React.Component {
           password: password
         })
       }).then(res => {
-        ok = res.ok;
         return res.json();
       }).then(result => {
-        if (!ok) {
-          err = result.err;
-          window.showMessageModal("danger", "Error", err);
+        window.removeLoadingModal();
+        if (result.err) {
+          window.showMessageModal("danger", "Error", result.err);
+        } else {
+          window.showMessageModal("success", "Success", "User is successfully created!", null, () => this.loginRef.setState({ isSignup: false }));
         }
       });
     }
@@ -272,7 +274,7 @@ class App extends React.Component {
                     (this.state.username && this.state.token && this.state.userLink ?
                       <NewsFeed username={this.state.username} token={this.state.token}
                         userLink={this.state.userLink} handleUnauthorization={this.checkLogin} />
-                      : <LoginPage isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
+                      : <LoginPage ref={ref => this.loginRef = ref} isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
                   }
                 </Route>
                 <Route exact path="/posts/:id" render={({ match }) =>

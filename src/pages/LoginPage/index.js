@@ -21,7 +21,7 @@ class LoginPage extends Component {
             <form className="card container w-25 p-5" onSubmit={() => this.props.handleLogin(this.state.username, this.state.password)}>
                 <div className="form-group">
                     <h1 className="nav-link text-center pb-4 pt-1" href="#">Instamini</h1>
-                    <input type="text" className="form-control" placeholder="Username" id="username" required onKeyDown={this.onKeyDown} 
+                    <input type="text" className="form-control" placeholder="Username" id="username" required onKeyDown={this.onKeyDown}
                         value={this.state.username} onChange={e => this.setState({ username: e.currentTarget.value })} />
                 </div>
                 <div className="form-group">
@@ -46,7 +46,7 @@ class SignUpPage extends Component {
             password: "",
             passwordConfirm: ""
         }
-        this.handleSignupCallback = () => 
+        this.handleSignupCallback = () =>
             this.props.handleSignup(this.state.username, this.state.displayName, this.state.password, this.state.passwordConfirm);
     }
 
@@ -72,12 +72,10 @@ class SignUpPage extends Component {
                     <input type="password" className="form-control" placeholder="Confirm password" id="pwd" required
                         value={this.state.passwordConfirm} onChange={e => this.setState({ passwordConfirm: e.target.value })} />
                 </div>
-            
+                    <button type="submit" className="btn btn-success">Sign Up</button>
+                <hr></hr>
+                <button type="submit" className="btn btn-primary" onClick={this.props.onSwitch}>Log In</button>
 
-            <button type="submit" className="btn btn-success">Sign Up</button>
-            <hr></hr>
-            <button type="submit" className="btn btn-primary" onClick={this.props.onSwitch}>Log In</button>
-                
             </form>
         );
     }
@@ -97,8 +95,8 @@ class Pages extends Component {
     render() {
         return (
             <div>
-                {this.state.isSignup ? <SignUpPage onSwitch={this.onSwitch} handleSignup={this.props.handleSignup} /> 
-                    : <LoginPage handleLogin={this.props.handleLogin} onSwitch={this.onSwitch} /> }
+                {this.state.isSignup ? <SignUpPage onSwitch={this.onSwitch} handleSignup={this.props.handleSignup} />
+                    : <LoginPage handleLogin={this.props.handleLogin} onSwitch={this.onSwitch} />}
             </div>
         );
     }

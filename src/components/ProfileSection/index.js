@@ -29,7 +29,6 @@ class Username extends Component {
             <div>
                 <div className="d-flex w-100 align-items-center">
                     <span style={{ fontSize: "1.5rem" }}>{this.props.username}</span>
-                    <EditProfile />
                 </div>
                 <span className="d-block" style={{ fontSize: "1.35rem" }}>{this.props.displayName}</span>
             </div>
@@ -74,8 +73,6 @@ class Counting extends Component {
                         </div>
                     </div>
                 </div>
-
-
             </div>
         );
     }
@@ -88,21 +85,107 @@ class EditProfile extends Component {
             username: "",
             displayName: "",
             password: "",
-            passwordConfirm: ""
+            newPassword: "",
+            passwordConfirm: "",
         }
         this.handleSignupCallback = () =>
-            this.props.handleSignup(this.state.username, this.state.displayName, this.state.password, this.state.passwordConfirm);
+            this.props.handleSignup(this.state.username, this.state.displayName, this.state.password, this.state.newPassword, this.state.passwordConfirm);
+
     }
+    handleEdit = (token, username, displayName, password, newPassword, newPasswordConfirm) => {
+        // check props.username and password
+        fetch(`${Constant.host}/session?key=${token}`, {
+            credentials: 'include'
+        }).then(res => {
+            const ok = res.ok;
+            if (!ok) return;
+
+            // construct body
+            let body = {};
+            if (newPassword) {
+                // check new pass & confirm
+                if (newPasswordConfirm !== newPassword) {
+                    return;
+                }
+                body.password = newPassword;
+            }
+            if (username) {
+                const usernameRegex = /^[A-Za-z0-9_]{6,}$/;
+                if (usernameRegex.test(username)) {
+                    body.username = username;
+                }
+            }
+
+            if (displayName) {
+                const displayNameRegex = /^.+$/;
+                if (displayNameRegex.test(displayName)) {
+                    body.displayName = displayName;
+                }
+            }
+
+            fetch(`${Constant.host}/users/${this.props.username}?key=${token}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        displayName: displayName,
+                        password: password,
+                        newPassword: newPassword,
+                        newPasswordConfirm: newPasswordConfirm
+                    })
+                }).then(() => {
+                    this.props.refresh();
+                });
+        });
+
+
+    }
+
+    handleDelete = (token, username) => {
+        const okToDelete = window.confirm("Are you sure want to delete?");
+        if (!okToDelete) {
+            return;
+        }
+        fetch(`${Constant.host}/users/${username}?key=${token}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(() => {
+                window.location.href = "/";
+            });
+    }
+    handleEditCallback = () => this.handleEdit(this.props.token)
+    handleDeleteCallback = () => this.handleDelete(this.props.token, this.props.username);
+
     render() {
         return (
             <div>
                 {/* <!-- Button trigger modal --> */}
-                <button type="button" className="btn btn-sm" data-toggle="modal" data-target="#modelId">
-                    <i className="fa fa-cog" aria-hidden="true"></i>
-                </button>
+                {this.props.canEdit ?
+                    <>
+                        <button className="nav-link fas fa-ellipsis-h fa-md mr-n2 text-dark bg-transparent border-0" href="#" id="navbarDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+
+                            <button className="dropdown-item row m-0 pl-2" onClick={this.handleEditCallback} data-target="#profileModal" data-toggle="modal">
+                                <i className="fas fa-edit fa-sm col-sm-4"></i>
+                                    Edit
+                            </button>
+                            <button className="dropdown-item row m-0 pl-2" onClick={this.handleDeleteCallback}>
+                                <i className="fas fa-times fa-sm col-sm-4"></i>
+                                    Delete
+                            </button>
+                        </div>
+                    </>
+                    : ""}
 
                 {/* <!-- Modal --> */}
-                <div className="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                <div className="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
                     <div className="modal-dialog" role="document">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -124,12 +207,19 @@ class EditProfile extends Component {
                                     value={this.state.password} onChange={e => this.setState({ password: e.target.value })} />
                             </div>
                             <div className="modal-body">
-                                <input type="password" className="form-control" placeholder="Confirm password" id="pwd"
-                                    value={this.state.passwordConfirm} onChange={e => this.setState({ passwordConfirm: e.target.value })} />
+                                <input type="password" className="form-control" placeholder="New password" id="pwd"
+                                    value={this.state.newPassword} onChange={e => this.setState({ newPassword: e.target.value })} />
+                            </div>
+                            <div className="modal-body">
+                                {this.state.newPassword ?
+                                    <input type="password" className="form-control" placeholder="Confirm password" id="pwd" required
+                                        value={this.state.passwordConfirm} onChange={e => this.setState({ passwordConfirm: e.target.value })} />
+                                    : ""
+                                }
                             </div>
                             <div className="modal-footer d-flex">
                                 <button className="btn btn-success">OK</button>
-                                <button className="btn btn-primary">Cancel</button>
+                                <button className="btn btn-secondary" data-dismiss="modal" data-target="#modalId">Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -169,14 +259,21 @@ class Profile extends Component {
         return (
             <div className="card container w-50 py-3 px-4 mt-3">
                 <div className="d-flex justify-content-between align-items-center">
-                    <Photo avatarLink={this.props.avatarLink} canEdit={!this.props.canFollow} 
-                        username={this.props.username} token={this.props.token} 
+                    <Photo avatarLink={this.props.avatarLink} canEdit={!this.props.canFollow}
+                        username={this.props.username} token={this.props.token}
                         refresh={this.props.refresh} />
                     <div className="col-sm-8">
                         <div className="d-flex justify-content-between">
                             <Username
                                 username={this.props.username}
                                 displayName={this.props.displayName} />
+                            <EditProfile
+                                username={this.props.username}
+                                token={this.props.token}
+                                canEdit={!this.props.canFollow}
+                                handleEdit={this.props.handleEdit}
+                                handleDelete={this.props.handleDelete}
+                                refresh={this.props.refresh} />
                             <FollowButton
                                 canFollow={this.props.canFollow}
                                 followed={this.props.followed}

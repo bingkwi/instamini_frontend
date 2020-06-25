@@ -52,10 +52,6 @@ class App extends React.Component {
           tokenResponse: {}
         })
       }).then(tokenResponse => {
-        if (!ok) {
-          window.showMessageModal('danger', 'Login failed', 'Login failed, please check username and password!');
-          return;
-        }
         this.setState({
           username: tokenResponse.username,
           displayName: tokenResponse.displayName,
@@ -64,6 +60,11 @@ class App extends React.Component {
           followings: tokenResponse.followings,
           userLink: tokenResponse.link,
           loading: false
+        }, () => {
+          if (!ok) {
+            window.showMessageModal('danger', 'Login failed', 'Login failed, please check username and password!');
+            return;
+          }
         });
       });
       // window.setTimeout(() => this.setState({ loading: false }), 500);

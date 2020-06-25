@@ -97,14 +97,14 @@ class EditProfile extends Component {
         fetch(`${Constant.host}/session`, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              username: this.props.username,
-              password: password
+                username: this.props.username,
+                password: password
             }),
             credentials: 'include'
-          }).then(res => {
+        }).then(res => {
             const ok = res.ok;
             if (!ok) return;
 
@@ -139,12 +139,23 @@ class EditProfile extends Component {
                     },
                     body: JSON.stringify(body)
                 }).then(() => {
-                    if(!username){
-                        window.location.reload();
-                    }else{
-                        window.location.href = `/${username}`;
-                    }
-                    
+                    fetch(`${Constant.host}/session`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            username: this.state.username,
+                            password: password
+                        }),
+                        credentials: 'include'
+                    }).then(() => {
+                        if (!username) {
+                            window.location.reload();
+                        } else {
+                            window.location.href = `/${username}`;
+                        }
+                    })
                 });
         });
 

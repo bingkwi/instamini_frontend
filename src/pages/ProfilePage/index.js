@@ -2,17 +2,20 @@ import React, { Component } from 'react';
 import Profile from "../../components/ProfileSection";
 import Gallery from "../../components/Gallery";
 import Constant from "../../utils/Constants";
+import NotFound from '../../components/NotFound';
 
 class ProfilePage extends Component {
 
     getProfile = (token, username) => {
-        let ok;
+        let ok, status;
         fetch(`${Constant.host}/users/${username}?key=${token}`)
             .then(res => {
                 ok = res.ok;
+                status = res.status;
                 return res.json();
             }).then(result => {
-                this.setState({ ...result }, () => document.title = `${result.displayName} (@${result.username}) | Instamini Photo Sharing`);
+                this.setState({ ...result, notFound: status === 404 }, 
+                    () => document.title = this.state.notFound ? "404 Not Found | Instamini Photo Sharing" : `${result.displayName} (@${result.username}) | Instamini Photo Sharing`);
             });
     }
 
@@ -46,6 +49,9 @@ class ProfilePage extends Component {
         return (
             <div>
                 {this.state === null ? "" :
+                this.state.notFound ? 
+                    <NotFound />
+                :
                     <>
                         <Profile
                             {...this.state}

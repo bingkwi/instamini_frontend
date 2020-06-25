@@ -68,9 +68,10 @@ function showMessageModal(bootstrapClass, title, message, modalToRemove='addLoca
     document.body.appendChild(div);
     $('#status_modal').modal('show');
     $(`#${modalToRemove}`).modal('hide');
-    if (dismissCallback !== null) {
-        $('#status_modal').on('hide.bs.modal', dismissCallback);
+    if (dismissCallback === null || !dismissCallback) {
+        dismissCallback = () => setTimeout(() => $('#status_modal').remove(), 500);
     }
+    $('#status_modal').on('hide.bs.modal', dismissCallback);
 }
 
 function closeModal(modalId) {

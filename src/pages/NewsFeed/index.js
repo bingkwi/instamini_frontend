@@ -66,7 +66,8 @@ class NewsFeed extends Component {
     render() {
         return (
             <div>
-                <PostInput handleSubmit={(caption, files) => this.handleSubmit(this.props.token, this.props.username, caption, files)} />
+                <PostInput avatarLink={this.props.avatarLink} 
+                    handleSubmit={(caption, files) => this.handleSubmit(this.props.token, this.props.username, caption, files)} />
                 {this.state.posts.map(post => <Post {...post} key={post.id} updatePosts={this.updatePosts} sessionUser={this.props.username} token={this.props.token} canEdit={post.username === this.props.username} />)}
             </div>
         );

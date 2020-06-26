@@ -62,7 +62,7 @@ class ProfilePage extends Component {
                             followed={this.state.followers.some(u => u.username === this.props.sessionUser)}
                             handleFollow={() => this.createFollow(this.props.token, this.props.sessionUser, this.props.username)}
                             handleUnfollow={() => this.deleteFollow(this.props.token, this.props.sessionUser, this.props.username)}
-                            refresh={() => this.getProfile(this.props.token, this.props.username)}
+                            refresh={() => {this.getProfile(this.props.token, this.props.username); this.props.reload()}}
                         />
                         <Gallery posts={this.state.posts} />
                     </>

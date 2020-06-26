@@ -28,7 +28,7 @@ class PostInput extends Component {
                     <span className="text-muted font-weight-bold">Create Post</span>
                 </div>
                 <div className="card-body d-flex py-3">
-                    <img src="./images/test.jpg" className="img-fluid rounded-circle mr-2" style={{ objectFit: "cover", width: "35px", height: "35px" }} alt="" />
+                    <img src={this.props.avatarLink} className="img-fluid rounded-circle mr-2" style={{ objectFit: "cover", width: "35px", height: "35px" }} alt="" />
                     <textarea type="text" className="form-control border border-white card container" 
                         placeholder="What's on your mind?" style={{ resize: "none" }} value={this.state.caption}
                         onChange={e => this.setState({ caption: e.target.value }, () => { if (this.state.caption === "") { this.setState({ canSubmit: false }); } if (this.state.caption !== "" && this.state.files) this.setState({ canSubmit: true }) })} />

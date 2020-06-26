@@ -90,12 +90,12 @@ class EditProfile extends Component {
         }
         this.handleSignupCallback = () =>
             this.props.handleSignup(this.state.username, this.state.displayName, this.state.password, this.state.newPassword, this.state.passwordConfirm);
-
+        this.modalRef = React.createRef();
     }
     handleEdit = (token, username, displayName, password, newPassword, newPasswordConfirm) => {
         window.showLoadingModal();
         // check props.username and password
-        fetch(`${Constant.host}/session`, {
+        fetch(`${Constant.host}/session/validate`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -103,29 +103,35 @@ class EditProfile extends Component {
             body: JSON.stringify({
                 username: this.props.username,
                 password: password
-            }),
-            credentials: 'include'
+            })
         }).then(res => {
             const ok = res.ok;
-            if (!ok) return;
+            if (!ok) {
+                window.removeLoadingModal();
+                window.showMessageModal('danger', 'Error', 'Current password is incorrect!', 'profileModal');
+                return;
+            }
 
             // construct body
             let body = {};
-            if (newPassword) {
+            if (newPassword !== "") {
                 // check new pass & confirm
-                if (newPasswordConfirm !== newPassword) {
+                const newPasswordRegex = /^.{6,}$/;
+                if (!newPasswordRegex.test(newPassword) || newPasswordConfirm !== newPassword) {
+                    window.removeLoadingModal();
+                    window.showMessageModal('danger', 'Error', 'Current password is incorrect!', 'profileModal');
                     return;
                 }
                 body.password = newPassword;
             }
-            if (username) {
+            if (username !== "") {
                 const usernameRegex = /^[A-Za-z0-9_]{6,}$/;
                 if (usernameRegex.test(username)) {
                     body.username = username;
                 }
             }
 
-            if (displayName) {
+            if (displayName !== "") {
                 const displayNameRegex = /^.+$/;
                 if (displayNameRegex.test(displayName)) {
                     body.displayName = displayName;
@@ -140,23 +146,11 @@ class EditProfile extends Component {
                     },
                     body: JSON.stringify(body)
                 }).then(() => {
-                    fetch(`${Constant.host}/session`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            username: this.state.username,
-                            password: password
-                        }),
-                        credentials: 'include'
-                    }).then(() => {
-                        if (!username) {
-                            window.location.reload();
-                        } else {
-                            window.location.href = `/${username}`;
-                        }
-                    })
+                    if (!username) {
+                        window.location.reload();
+                    } else {
+                        window.location.href = `/${username}`;
+                    }
                 });
         });
 
@@ -181,6 +175,18 @@ class EditProfile extends Component {
     handleEditCallback = () => this.handleEdit(this.props.token, this.state.username, this.state.displayName, this.state.password, this.state.newPassword, this.state.newPasswordConfirm)
     handleDeleteCallback = () => this.handleDelete(this.props.token, this.props.username);
 
+    componentDidMount() {
+        window.addCloseEventToModal(this.modalRef.current, () => {
+            this.setState({
+                username: "",
+                displayName: "",
+                password: "",
+                newPassword: "",
+                passwordConfirm: "",
+            });
+        })
+    }
+
     render() {
         return (
             <div>
@@ -204,7 +210,7 @@ class EditProfile extends Component {
                     : ""}
 
                 {/* <!-- Modal --> */}
-                <div className="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                <div ref={this.modalRef} className="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
                     <div className="modal-dialog" role="document">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -215,7 +221,7 @@ class EditProfile extends Component {
                             </div>
                             <div className="modal-body">
                                 <input type="text" className="form-control" placeholder="Username"
-                                    id="username" value={this.state.username} onChange={e => this.setState({ username: e.target.value })} />
+                                    id="username" disabled value={this.props.username} />
                             </div>
                             <div className="modal-body">
                                 <input type="text" className="form-control" placeholder="Full name"
@@ -237,7 +243,9 @@ class EditProfile extends Component {
                                 }
                             </div>
                             <div className="modal-footer d-flex">
-                                <button className="btn btn-success" onClick={this.handleEditCallback}>OK</button>
+                                <button className="btn btn-success"
+                                    disabled={!(this.state.displayName !== "" || this.state.newPassword !== "")}
+                                    onClick={this.handleEditCallback}>OK</button>
                                 <button className="btn btn-secondary" data-dismiss="modal" data-target="#profileModal">Cancel</button>
                             </div>
                         </div>

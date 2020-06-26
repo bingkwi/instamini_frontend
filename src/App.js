@@ -274,7 +274,7 @@ class App extends React.Component {
                   {this.state.loading === true || this.state.isSearching === true ? "" :
                     (this.state.username && this.state.token && this.state.userLink ?
                       <NewsFeed username={this.state.username} token={this.state.token}
-                        userLink={this.state.userLink} handleUnauthorization={this.checkLogin} />
+                        userLink={this.state.userLink} handleUnauthorization={this.checkLogin} avatarLink={`${Constant.host}${this.state.avatarLink}`}/>
                       : <LoginPage ref={ref => this.loginRef = ref} isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
                   }
                 </Route>
@@ -287,7 +287,8 @@ class App extends React.Component {
                 <Route exact path="/:username" render={({ match }) =>
                   this.state.isSearching === true ? "" : (this.state.token || this.getCookie("Token")) ?
                     <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.getCookie("Token")}
-                      canFollow={match.params.username !== this.state.username} sessionUser={this.state.username} currentFollowings={this.state.followings} />
+                      canFollow={match.params.username !== this.state.username} reload={this.checkLogin} 
+                      sessionUser={this.state.username} currentFollowings={this.state.followings} />
                     : window.location.href = "/"
                 }>
                 </Route>

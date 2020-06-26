@@ -281,7 +281,7 @@ class App extends React.Component {
                 <Route exact path="/posts/:id" render={({ match }) =>
                   this.state.username && this.state.token && this.state.userLink ?
                     <FullPost id={match.params.id} username={this.state.username} token={this.state.token} userLink={this.state.userLink} />
-                    : ""
+                    : window.location.href = "/"
                 }>
                 </Route>
                 <Route exact path="/:username" render={({ match }) =>

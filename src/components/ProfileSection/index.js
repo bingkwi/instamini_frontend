@@ -93,6 +93,7 @@ class EditProfile extends Component {
 
     }
     handleEdit = (token, username, displayName, password, newPassword, newPasswordConfirm) => {
+        window.showLoadingModal();
         // check props.username and password
         fetch(`${Constant.host}/session`, {
             method: "POST",

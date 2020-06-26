@@ -46,7 +46,7 @@ class FullPost extends Component {
                     postList = [post];
                 }
                 this.setState({ posts: postList, loading: false, notFound: status === 404 }, () => {
-                    document.title = this.state.notFound ? "404 Not Found | Instamini Photo Sharing" 
+                    document.title = !ok ? "404 Not Found | Instamini Photo Sharing" 
                         : `@${post.username} on Instamini: "${post.caption.substring(0, 100)}${post.caption.length > 100 ? "..." : ""}"`;
                 });
             });

@@ -42,7 +42,7 @@ class App extends React.Component {
           username: username,
           password: password
         }),
-        credentials: 'include'
+
       }).then(res => {
         statusCode = res.status;
         if (ok = res.ok) {
@@ -52,6 +52,14 @@ class App extends React.Component {
           tokenResponse: {}
         })
       }).then(tokenResponse => {
+        localStorage.token = {
+          username: tokenResponse.username,
+          displayName: tokenResponse.displayName,
+          token: tokenResponse.token,
+          userLink: tokenResponse.link,
+          avatarLink: tokenResponse.avatarLink,
+          followings: tokenResponse.followings
+        };
         this.setState({
           username: tokenResponse.username,
           displayName: tokenResponse.displayName,
@@ -71,7 +79,7 @@ class App extends React.Component {
     });
   }
 
-  getCookie = function (name) {
+  localStorage = function (name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     if (match) return match[2];
   }
@@ -79,14 +87,14 @@ class App extends React.Component {
   checkLogin = () => {
     this.setState({ loading: true }, () => {
       let ok;
-      let token = this.getCookie("Token");
+      let token = this.localStorage("Token");
       if (!token) {
         this.setState({ loading: false });
         return;
       }
       token = token ? token : "";
       fetch(`${Constant.host}/session?key=${token}`, {
-        credentials: 'include'
+
       }).then(res => {
         if (ok = res.ok) {
           return res.json();
@@ -98,6 +106,14 @@ class App extends React.Component {
         if (!ok && token === "" && this.state.username) {
           window.showMessageModal("danger", "Session timed out", "Your session has timed out, please login again!");
         }
+        localStorage.token = {
+          username: tokenResponse.username,
+          displayName: tokenResponse.displayName,
+          token: tokenResponse.token,
+          userLink: tokenResponse.link,
+          avatarLink: tokenResponse.avatarLink,
+          followings: tokenResponse.followings
+        };
         this.setState({
           username: tokenResponse.username,
           displayName: tokenResponse.displayName,
@@ -114,10 +130,10 @@ class App extends React.Component {
 
   logout = () => {
     this.setState({ loading: true }, () => {
-      const token = this.getCookie("Token") ? this.getCookie("Token") : "";
+      const token = this.localStorage("Token") ? this.localStorage("Token") : "";
       fetch(`${Constant.host}/session?key=${token}`, {
         method: "DELETE",
-        credentials: 'include'
+
       }).then(() => {
         this.setState({
           loading: false,
@@ -274,7 +290,7 @@ class App extends React.Component {
                   {this.state.loading === true || this.state.isSearching === true ? "" :
                     (this.state.username && this.state.token && this.state.userLink ?
                       <NewsFeed username={this.state.username} token={this.state.token}
-                        userLink={this.state.userLink} handleUnauthorization={this.checkLogin} avatarLink={`${Constant.host}${this.state.avatarLink}`}/>
+                        userLink={this.state.userLink} handleUnauthorization={this.checkLogin} avatarLink={`${Constant.host}${this.state.avatarLink}`} />
                       : <LoginPage ref={ref => this.loginRef = ref} isSignup={false} handleLogin={this.login} handleSignup={this.signup} />)
                   }
                 </Route>
@@ -285,9 +301,9 @@ class App extends React.Component {
                 }>
                 </Route>
                 <Route exact path="/:username" render={({ match }) =>
-                  this.state.isSearching === true ? "" : (this.state.token || this.getCookie("Token")) ?
-                    <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.getCookie("Token")}
-                      canFollow={match.params.username !== this.state.username} reload={this.checkLogin} 
+                  this.state.isSearching === true ? "" : (this.state.token || this.localStorage("Token")) ?
+                    <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.localStorage("Token")}
+                      canFollow={match.params.username !== this.state.username} reload={this.checkLogin}
                       sessionUser={this.state.username} currentFollowings={this.state.followings} />
                     : window.location.href = "/"
                 }>

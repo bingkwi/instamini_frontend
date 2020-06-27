@@ -52,14 +52,8 @@ class App extends React.Component {
           tokenResponse: {}
         })
       }).then(tokenResponse => {
-        localStorage.token = {
-          username: tokenResponse.username,
-          displayName: tokenResponse.displayName,
-          token: tokenResponse.token,
-          userLink: tokenResponse.link,
-          avatarLink: tokenResponse.avatarLink,
-          followings: tokenResponse.followings
-        };
+        // console.log(tokenResponse.token); 
+        localStorage.token = tokenResponse.token;
         this.setState({
           username: tokenResponse.username,
           displayName: tokenResponse.displayName,
@@ -79,15 +73,10 @@ class App extends React.Component {
     });
   }
 
-  localStorage = function (name) {
-    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    if (match) return match[2];
-  }
-
   checkLogin = () => {
     this.setState({ loading: true }, () => {
       let ok;
-      let token = this.localStorage("Token");
+      let token = localStorage.token;
       if (!token) {
         this.setState({ loading: false });
         return;
@@ -106,14 +95,7 @@ class App extends React.Component {
         if (!ok && token === "" && this.state.username) {
           window.showMessageModal("danger", "Session timed out", "Your session has timed out, please login again!");
         }
-        localStorage.token = {
-          username: tokenResponse.username,
-          displayName: tokenResponse.displayName,
-          token: tokenResponse.token,
-          userLink: tokenResponse.link,
-          avatarLink: tokenResponse.avatarLink,
-          followings: tokenResponse.followings
-        };
+        localStorage.token = tokenResponse.token;
         this.setState({
           username: tokenResponse.username,
           displayName: tokenResponse.displayName,
@@ -130,11 +112,12 @@ class App extends React.Component {
 
   logout = () => {
     this.setState({ loading: true }, () => {
-      const token = this.localStorage("Token") ? this.localStorage("Token") : "";
+      const token = localStorage.token ? localStorage.token : "";
       fetch(`${Constant.host}/session?key=${token}`, {
         method: "DELETE",
 
       }).then(() => {
+        localStorage.token = undefined;
         this.setState({
           loading: false,
           username: undefined,
@@ -301,8 +284,8 @@ class App extends React.Component {
                 }>
                 </Route>
                 <Route exact path="/:username" render={({ match }) =>
-                  this.state.isSearching === true ? "" : (this.state.token || this.localStorage("Token")) ?
-                    <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : this.localStorage("Token")}
+                  this.state.isSearching === true ? "" : (this.state.token || localStorage.token) ?
+                    <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : localStorage.token}
                       canFollow={match.params.username !== this.state.username} reload={this.checkLogin}
                       sessionUser={this.state.username} currentFollowings={this.state.followings} />
                     : window.location.href = "/"

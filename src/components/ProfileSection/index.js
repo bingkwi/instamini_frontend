@@ -52,7 +52,8 @@ class Counting extends Component {
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <FollowList follows={this.props.followers} currentFollowings={this.props.currentFollowings} sessionUser={this.props.sessionUser} />
+                                <FollowList follows={this.props.followers} currentFollowings={this.props.currentFollowings} sessionUser={this.props.sessionUser}
+                                    handleFollow={this.props.handleFollow} handleUnfollow={this.props.handleUnfollow} />
                             </div>
                         </div>
                     </div>
@@ -95,7 +96,7 @@ class EditProfile extends Component {
     handleEdit = (token, username, displayName, password, newPassword, newPasswordConfirm) => {
         window.showLoadingModal();
         // check props.username and password
-        fetch(`${Constant.host}/session/validate`, {
+        fetch(`${Constant.host}/session`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -119,7 +120,7 @@ class EditProfile extends Component {
                 const newPasswordRegex = /^.{6,}$/;
                 if (!newPasswordRegex.test(newPassword) || newPasswordConfirm !== newPassword) {
                     window.removeLoadingModal();
-                    window.showMessageModal('danger', 'Error', 'Current password is incorrect!', 'profileModal');
+                    window.showMessageModal('danger', 'Error', `Password error: ${newPassword}-${newPasswordConfirm}`, 'profileModal');
                     return;
                 }
                 body.password = newPassword;
@@ -172,7 +173,7 @@ class EditProfile extends Component {
                 window.location.href = "/";
             });
     }
-    handleEditCallback = () => this.handleEdit(this.props.token, this.state.username, this.state.displayName, this.state.password, this.state.newPassword, this.state.newPasswordConfirm)
+    handleEditCallback = () => this.handleEdit(this.props.token, this.props.username, this.state.displayName, this.state.password, this.state.newPassword, this.state.newPasswordConfirm)
     handleDeleteCallback = () => this.handleDelete(this.props.token, this.props.username);
 
     componentDidMount() {

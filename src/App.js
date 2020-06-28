@@ -287,7 +287,8 @@ class App extends React.Component {
                   this.state.isSearching === true ? "" : (this.state.token || localStorage.token) ?
                     <ProfilePage username={match.params.username} token={this.state.token ? this.state.token : localStorage.token}
                       canFollow={match.params.username !== this.state.username} reload={this.checkLogin}
-                      sessionUser={this.state.username} currentFollowings={this.state.followings} />
+                      sessionUser={this.state.username} currentFollowings={this.state.followings}
+                      handleFollow={this.createFollowCallback} handleUnfollow={this.deleteFollowCallback} />
                     : window.location.href = "/"
                 }>
                 </Route>

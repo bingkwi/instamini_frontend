@@ -69,7 +69,8 @@ class Counting extends Component {
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <FollowList follows={this.props.followings} currentFollowings={this.props.currentFollowings} sessionUser={this.props.sessionUser} />
+                                <FollowList follows={this.props.followings} currentFollowings={this.props.currentFollowings} sessionUser={this.props.sessionUser}
+                                    handleFollow={this.props.handleFollow} handleUnfollow={this.props.handleUnfollow} />
                             </div>
                         </div>
                     </div>
@@ -319,6 +320,8 @@ class Profile extends Component {
                                 followings={this.props.followings}
                                 currentFollowings={this.props.currentFollowings}
                                 sessionUser={this.props.sessionUser}
+                                handleFollow={this.props._handleFollow}
+                                handleUnfollow={this.props._handleUnfollow}
                             />
                         </div>
 

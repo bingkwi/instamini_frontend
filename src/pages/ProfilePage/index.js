@@ -18,6 +18,7 @@ class ProfilePage extends Component {
                     () => document.title = this.state.notFound ? "404 Not Found | Instamini Photo Sharing" : `${result.displayName} (@${result.username}) | Instamini Photo Sharing`);
             });
     }
+    getProfileCallback = () => this.getProfile(this.props.token, this.props.username);
 
     createFollow = (token, username, followedUsername) => {
         if (!followedUsername) return;
@@ -62,6 +63,8 @@ class ProfilePage extends Component {
                             followed={this.state.followers.some(u => u.username === this.props.sessionUser)}
                             handleFollow={() => this.createFollow(this.props.token, this.props.sessionUser, this.props.username)}
                             handleUnfollow={() => this.deleteFollow(this.props.token, this.props.sessionUser, this.props.username)}
+                            _handleFollow={username => { this.props.handleFollow(username); this.getProfileCallback(); }}
+                            _handleUnfollow={username => { this.props.handleUnfollow(username); this.getProfileCallback(); }}
                             refresh={() => {this.getProfile(this.props.token, this.props.username); this.props.reload()}}
                         />
                         <Gallery posts={this.state.posts} />

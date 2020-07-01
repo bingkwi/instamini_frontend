@@ -209,6 +209,7 @@ class App extends React.Component {
         } else {
 
         }
+        this.checkLogin();
         this.handleSearchCallback();
       })
   };
@@ -220,7 +221,7 @@ class App extends React.Component {
       method: "DELETE"
     }).then(res => {
       ok = res.ok;
-      console.log(ok);
+      this.checkLogin();
       this.handleSearchCallback();
     });
   };
